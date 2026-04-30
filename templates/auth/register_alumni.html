@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Alumni Registration — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh;padding:4rem 0;position:relative">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 80%,rgba(240,180,41,0.04) 0%,transparent 60%)"></div>
+
+  <div class="container" style="max-width:680px;position:relative;z-index:1">
+    <div class="form-glass">
+      <div class="text-center mb-4">
+        <div class="auth-logo">AlumniConnect®</div>
+        <div class="auth-role-badge mx-auto" style="width:fit-content;background:var(--gold-soft);color:var(--gold);border-color:rgba(240,180,41,0.25)">
+          <i class="bi bi-briefcase-fill"></i> Alumni Registration
+        </div>
+        <p style="font-size:.875rem;color:var(--text-muted);margin-top:.5rem">Share your experience · Mentor the next generation</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">First Name</label>
+              <input type="text" name="first_name" class="form-control-glass" required>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Last Name</label>
+              <input type="text" name="last_name" class="form-control-glass" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Username</label>
+              <input type="text" name="username" class="form-control-glass" required>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Email</label>
+              <input type="email" name="email" class="form-control-glass" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-8">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Current Company</label>
+              <input type="text" name="company" class="form-control-glass" placeholder="Google, Startup, etc." required>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Years of Exp.</label>
+              <input type="number" name="experience_years" class="form-control-glass" min="0" max="50" placeholder="5" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Job Title / Role</label>
+          <input type="text" name="role" class="form-control-glass" placeholder="Senior Software Engineer" required>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Branch / Department</label>
+              <input type="text" name="branch" class="form-control-glass" placeholder="Computer Science" required>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Graduation Year</label>
+              <input type="number" name="graduation_year" class="form-control-glass" min="1970" max="2030" placeholder="2020" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Domain / Specialization</label>
+          <input type="text" name="domain" class="form-control-glass" placeholder="Artificial Intelligence, Finance, Product Management">
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Skills (comma-separated)</label>
+          <input type="text" name="skills" class="form-control-glass" placeholder="Leadership, Python, System Design">
+          <div id="skills-preview" style="margin-top:6px"></div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">LinkedIn URL (optional)</label>
+          <input type="url" name="linkedin" class="form-control-glass" placeholder="https://linkedin.com/in/yourprofile">
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Bio</label>
+          <textarea name="bio" class="form-control-glass" rows="3" placeholder="Tell students about your journey and what you can offer as a mentor..."></textarea>
+        </div>
+
+        <div class="form-group-glass d-flex align-items-center gap-3">
+          <input type="checkbox" name="is_open_to_mentor" id="mentor_check" checked style="width:18px;height:18px;accent-color:var(--accent)">
+          <label for="mentor_check" style="color:var(--text-muted);font-size:.875rem;cursor:pointer">I'm open to mentoring students</label>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Password</label>
+              <input type="password" name="password1" class="form-control-glass" required>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Confirm Password</label>
+              <input type="password" name="password2" class="form-control-glass" required>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2" style="background:linear-gradient(135deg,var(--gold),#c8910a);color:#1a0e00">
+          <i class="bi bi-person-plus"></i> Create Alumni Account
+        </button>
+      </form>
+
+      <div style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--text-muted)">
+        Already have an account?
+        <a href="{% url 'login_alumni' %}" style="color:var(--gold);font-weight:600"> Sign In</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

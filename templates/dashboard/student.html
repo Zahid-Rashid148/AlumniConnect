@@ -1,0 +1,385 @@
+{% extends 'base.html' %} {% block title %}Student Dashboard — AlumniConnect®{%
+endblock %} {% block content %}
+<div class="dashboard-wrap">
+  <div class="container">
+    <!-- Header -->
+    <div class="dashboard-header animate-rise">
+      <div
+        class="d-flex justify-content-between align-items-start flex-wrap gap-2"
+      >
+        <div>
+          <div class="section-eyebrow">Student Dashboard</div>
+          <h1 class="dashboard-greeting">
+            Good day, {{ user.display_name }} 👋
+          </h1>
+          <p class="dashboard-subtitle">
+            Track your mentorships, explore alumni, and discover opportunities.
+          </p>
+        </div>
+        <a href="{% url 'alumni_list' %}" class="btn-primary-glass">
+          <i class="bi bi-search"></i> Find a Mentor
+        </a>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    {% if notifications %}
+    <div class="mb-4 animate-rise-1">
+      {% for notif in notifications %}
+      <div class="alert-glass info mb-2">
+        <i class="bi bi-bell-fill"></i> {{ notif.title }} — {{ notif.message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4 animate-rise-1">
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <span class="stat-icon">🤝</span>
+          <div class="stat-value">{{ accepted_mentors.count }}</div>
+          <div class="stat-label">Active Mentors</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <span class="stat-icon">⏳</span>
+          <div class="stat-value">{{ pending_requests.count }}</div>
+          <div class="stat-label">Pending Requests</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <span class="stat-icon">💬</span>
+          <div class="stat-value">{{ unread_messages }}</div>
+          <div class="stat-label">Unread Messages</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <span class="stat-icon">📋</span>
+          <div class="stat-value">{{ recent_posts.count }}</div>
+          <div class="stat-label">New Opportunities</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Left Column -->
+      <div class="col-lg-8">
+        <!-- Active Mentors -->
+        <div class="glass-card-flat p-4 mb-4 animate-rise-2">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3
+              style="
+                font-family: &quot;Instrument Serif&quot;, serif;
+                font-size: 1.2rem;
+                margin: 0;
+              "
+            >
+              Active Mentors
+            </h3>
+            <a
+              href="{% url 'alumni_list' %}"
+              style="font-size: 0.8rem; color: var(--accent)"
+              >Find More →</a
+            >
+          </div>
+          {% if accepted_mentors %}
+          <div class="row g-3">
+            {% for req in accepted_mentors %}
+            <div class="col-sm-6">
+              <div class="user-card">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="user-avatar">
+                    {% if req.alumni.avatar %}
+                    <img src="{{ req.alumni.avatar.url }}" alt="" />
+                    {% else %} {{ req.alumni.display_name|first|upper }} {%
+                    endif %}
+                  </div>
+                  <div>
+                    <div class="user-name">{{ req.alumni.display_name }}</div>
+                    {% if req.alumni.alumni_profile %}
+                    <div class="user-company">
+                      {{ req.alumni.alumni_profile.company }}
+                    </div>
+                    <div class="user-meta">
+                      {{ req.alumni.alumni_profile.role }}
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                  <a
+                    href="{% url 'chat' req.alumni.id %}"
+                    class="btn-success-glass"
+                  >
+                    <i class="bi bi-chat-dots"></i> Message
+                  </a>
+                  <a
+                    href="{% url 'view_profile' req.alumni.id %}"
+                    class="btn-ghost-glass"
+                    style="font-size: 0.8rem; padding: 0.4rem 0.9rem"
+                    >Profile</a
+                  >
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">🤝</div>
+            <div class="empty-state-title">No Mentors Yet</div>
+            <div class="empty-state-text">
+              Connect with alumni and send a mentorship request to get started.
+            </div>
+            <a href="{% url 'alumni_list' %}" class="btn-primary-glass"
+              >Browse Alumni</a
+            >
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Pending Requests -->
+        {% if pending_requests %}
+        <div class="glass-card-flat p-4 mb-4 animate-rise-3">
+          <h3
+            style="
+              font-family: &quot;Instrument Serif&quot;, serif;
+              font-size: 1.2rem;
+              margin-bottom: 1rem;
+            "
+          >
+            Pending Requests
+          </h3>
+          {% for req in pending_requests %}
+          <div
+            class="request-card mb-2 d-flex justify-content-between align-items-center flex-wrap gap-2"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <div
+                class="user-avatar"
+                style="width: 40px; height: 40px; font-size: 1rem"
+              >
+                {{ req.alumni.display_name|first|upper }}
+              </div>
+              <div>
+                <div class="user-name">{{ req.alumni.display_name }}</div>
+                {% if req.alumni.alumni_profile %}
+                <div class="user-meta">
+                  {{ req.alumni.alumni_profile.company }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <span class="badge-glass badge-pending"
+              ><i class="bi bi-clock"></i> Pending</span
+            >
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Recent Posts -->
+        <div class="glass-card-flat p-4 animate-rise-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3
+              style="
+                font-family: &quot;Instrument Serif&quot;, serif;
+                font-size: 1.2rem;
+                margin: 0;
+              "
+            >
+              Latest Opportunities
+            </h3>
+            <a
+              href="{% url 'posts_list' %}"
+              style="font-size: 0.8rem; color: var(--accent)"
+              >View All →</a
+            >
+          </div>
+          {% if recent_posts %} {% for post in recent_posts %}
+          <div class="post-card mb-3">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <div class="post-title">{{ post.title }}</div>
+                <div class="post-meta">
+                  by {{ post.author.display_name }} {% if post.company %}· {{
+                  post.company }}{% endif %} {% if post.location %}·
+                  <i class="bi bi-geo-alt"></i> {{ post.location }}{% endif %}
+                </div>
+              </div>
+              <span class="badge-glass badge-{{ post.post_type }}"
+                >{{ post.get_post_type_display }}</span
+              >
+            </div>
+            <p
+              style="
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                margin: 0;
+                line-height: 1.6;
+              "
+            >
+              {{ post.content|truncatechars:100 }}
+            </p>
+            {% if post.link %}
+            <a
+              href="{{ post.link }}"
+              target="_blank"
+              class="btn-ghost-glass mt-2"
+              style="font-size: 0.8rem; padding: 0.4rem 0.9rem"
+            >
+              Apply <i class="bi bi-arrow-up-right"></i>
+            </a>
+            {% endif %}
+          </div>
+          {% endfor %} {% else %}
+          <div class="empty-state" style="padding: 2rem">
+            <div class="empty-state-icon">💼</div>
+            <div class="empty-state-title">No Opportunities Yet</div>
+            <div class="empty-state-text">
+              Alumni will post jobs and internships here.
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="col-lg-4">
+        <!-- Profile Card -->
+        <div class="glass-card-flat p-4 mb-4 animate-rise-2">
+          <div class="text-center mb-3">
+            <div
+              class="user-avatar"
+              style="
+                width: 64px;
+                height: 64px;
+                font-size: 1.5rem;
+                margin: 0 auto;
+              "
+            >
+              {{ user.display_name|first|upper }}
+            </div>
+            <div
+              style="
+                margin-top: 0.75rem;
+                font-weight: 600;
+                color: var(--text-primary);
+              "
+            >
+              {{ user.display_name }}
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted)">
+              {{ user.email }}
+            </div>
+            {% if user.student_profile %}
+            <div
+              style="
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-top: 0.25rem;
+              "
+            >
+              {{ user.student_profile.branch }} · Year {{
+              user.student_profile.year }}
+            </div>
+            {% endif %}
+          </div>
+          {% if user.student_profile and user.student_profile.skills %}
+          <div style="margin-top: 0.75rem">
+            {% for skill in user.student_profile.skills_list %}
+            <span class="skill-tag">{{ skill }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <a
+            href="{% url 'edit_profile' %}"
+            class="btn-ghost-glass w-100 justify-content-center mt-3"
+            style="font-size: 0.85rem"
+          >
+            <i class="bi bi-pencil"></i> Edit Profile
+          </a>
+        </div>
+
+        <!-- Quick Alumni Browse -->
+        <div class="glass-card-flat p-4 animate-rise-3">
+          <h3
+            style="
+              font-family: &quot;Instrument Serif&quot;, serif;
+              font-size: 1rem;
+              margin-bottom: 1rem;
+              color: var(--text-muted);
+            "
+          >
+            Recommended Alumni
+          </h3>
+          {% if alumni_list %} {% for alum in alumni_list %}
+          <div
+            class="d-flex align-items-center gap-3 mb-3 pb-3"
+            style="border-bottom: 1px solid var(--glass-border)"
+          >
+            <div
+              class="user-avatar"
+              style="
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+                flex-shrink: 0;
+              "
+            >
+              {{ alum.display_name|first|upper }}
+            </div>
+            <div style="flex: 1; min-width: 0">
+              <div
+                style="
+                  font-size: 0.875rem;
+                  font-weight: 600;
+                  color: var(--text-primary);
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                "
+              >
+                {{ alum.display_name }}
+              </div>
+              {% if alum.alumni_profile %}
+              <div style="font-size: 0.75rem; color: var(--text-muted)">
+                {{ alum.alumni_profile.company }}
+              </div>
+              {% endif %}
+            </div>
+            <a
+              href="{% url 'view_profile' alum.id %}"
+              style="
+                font-size: 0.75rem;
+                color: var(--accent);
+                white-space: nowrap;
+              "
+              >View →</a
+            >
+          </div>
+          {% endfor %}
+          <a
+            href="{% url 'alumni_list' %}"
+            class="btn-ghost-glass w-100 justify-content-center"
+            style="font-size: 0.8rem"
+          >
+            See All Alumni <i class="bi bi-arrow-right"></i>
+          </a>
+          {% else %}
+          <div class="empty-state" style="padding: 1.5rem">
+            <div style="font-size: 0.85rem; color: var(--text-muted)">
+              No alumni available yet.
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

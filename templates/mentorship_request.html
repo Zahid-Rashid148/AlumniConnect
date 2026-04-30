@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Request Mentorship — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh;padding:4rem 0;position:relative">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 30%,rgba(0,200,255,0.05) 0%,transparent 60%)"></div>
+
+  <div class="container" style="max-width:580px;position:relative;z-index:1">
+
+    <!-- Alumni Preview -->
+    <div class="glass-card p-4 mb-4 animate-rise">
+      <div class="d-flex align-items-center gap-4">
+        <div class="user-avatar" style="width:60px;height:60px;font-size:1.4rem;flex-shrink:0">{{ alumni.display_name|first|upper }}</div>
+        <div>
+          <div style="font-size:.7rem;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.25rem">Requesting Mentorship From</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--text-primary)">{{ alumni.display_name }}</div>
+          {% if alumni.alumni_profile %}
+          <div style="font-size:.875rem;color:var(--accent)">{{ alumni.alumni_profile.role }} at {{ alumni.alumni_profile.company }}</div>
+          <div style="font-size:.8rem;color:var(--text-muted);margin-top:.25rem">
+            {{ alumni.alumni_profile.experience_years }} years experience ·
+            Class of {{ alumni.alumni_profile.graduation_year }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Form -->
+    <div class="form-glass animate-rise-1">
+      <h2 style="font-family:'Instrument Serif',serif;font-size:1.5rem;margin-bottom:.5rem">Your Mentorship Request</h2>
+      <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:1.75rem">
+        Write a compelling message. Alumni are more likely to accept requests that show genuine intent and clarity of purpose.
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group-glass">
+          <label class="form-label-glass">Introduction & Why This Mentor</label>
+          <textarea name="message" class="form-control-glass" rows="5"
+                    placeholder="Hi! I'm [your name], a [year] year [branch] student. I've been following your work at [company] and I'm particularly inspired by [specific thing]. I'm reaching out because..."
+                    required></textarea>
+          <div style="font-size:.72rem;color:var(--text-dim);margin-top:.4rem">Be specific about why you chose this particular alumni.</div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Your Goals (optional)</label>
+          <textarea name="goals" class="form-control-glass" rows="3"
+                    placeholder="Through this mentorship, I hope to learn about [topic], get guidance on [challenge], and ultimately achieve [goal]..."></textarea>
+        </div>
+
+        <div class="d-flex gap-3 mt-2">
+          <button type="submit" class="btn-primary-glass flex-grow-1 justify-content-center">
+            <i class="bi bi-send-fill"></i> Send Request
+          </button>
+          <a href="{% url 'alumni_list' %}" class="btn-ghost-glass">
+            <i class="bi bi-arrow-left"></i> Back
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tips -->
+    <div class="glass-card-flat p-3 mt-3 animate-rise-2">
+      <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem">
+        <i class="bi bi-lightbulb"></i> Tips for a Great Request
+      </div>
+      <div style="font-size:.8rem;color:var(--text-muted);line-height:1.7">
+        ✦ Be specific about your background and current challenges<br>
+        ✦ Show you've researched the alumni's career<br>
+        ✦ State clear, achievable goals for the mentorship<br>
+        ✦ Keep it concise and professional
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

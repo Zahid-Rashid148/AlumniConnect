@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.display_name }} — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrap">
+  <div class="container" style="max-width:800px">
+
+    <!-- Profile Card -->
+    <div class="glass-card overflow-hidden mb-4 animate-rise" style="padding:0">
+      <!-- Cover -->
+      <div class="profile-cover">
+        <div class="profile-avatar-large">{{ profile_user.display_name|first|upper }}</div>
+      </div>
+
+      <!-- Info -->
+      <div style="padding:3.5rem 2rem 2rem">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+          <div>
+            <h1 style="font-family:'Instrument Serif',serif;font-size:1.8rem;margin-bottom:.25rem">{{ profile_user.display_name }}</h1>
+            <div style="font-size:.85rem;color:var(--text-muted)">@{{ profile_user.username }}</div>
+
+            {% if profile_user.role == 'alumni' and alumni_profile %}
+            <div style="font-size:1rem;color:var(--accent);font-weight:600;margin-top:.5rem">
+              {{ alumni_profile.role }} at {{ alumni_profile.company }}
+            </div>
+            <div style="font-size:.85rem;color:var(--text-muted)">
+              {{ alumni_profile.experience_years }} years exp · Class of {{ alumni_profile.graduation_year }} · {{ alumni_profile.branch }}
+            </div>
+            {% elif profile_user.role == 'student' and student_profile %}
+            <div style="font-size:.9rem;color:var(--text-muted);margin-top:.5rem">
+              {{ student_profile.branch }} · Year {{ student_profile.year }}
+              {% if student_profile.roll_number %}· {{ student_profile.roll_number }}{% endif %}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2 flex-wrap">
+            {% if request.user == profile_user %}
+              <a href="{% url 'edit_profile' %}" class="btn-ghost-glass">
+                <i class="bi bi-pencil"></i> Edit Profile
+              </a>
+            {% elif request.user.role == 'student' and profile_user.role == 'alumni' %}
+              <a href="{% url 'send_mentorship_request' profile_user.id %}" class="btn-primary-glass">
+                <i class="bi bi-send"></i> Request Mentorship
+              </a>
+            {% endif %}
+            {% if profile_user.linkedin %}
+            <a href="{{ profile_user.linkedin }}" target="_blank" class="btn-ghost-glass">
+              <i class="bi bi-linkedin"></i> LinkedIn
+            </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Bio -->
+        {% if profile_user.bio %}
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--glass-border)">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">About</div>
+          <p style="font-size:.9rem;color:var(--text-primary);line-height:1.7">{{ profile_user.bio }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Skills -->
+        {% if profile_user.role == 'alumni' and alumni_profile and alumni_profile.skills %}
+        <div style="margin-top:1.25rem">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">Skills</div>
+          {% for skill in alumni_profile.skills_list %}
+            <span class="skill-tag">{{ skill }}</span>
+          {% endfor %}
+        </div>
+        {% elif profile_user.role == 'student' and student_profile and student_profile.skills %}
+        <div style="margin-top:1.25rem">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">Skills</div>
+          {% for skill in student_profile.skills_list %}
+            <span class="skill-tag">{{ skill }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Alumni Extra Details -->
+        {% if profile_user.role == 'alumni' and alumni_profile %}
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:1.5rem">
+          {% if alumni_profile.domain %}
+          <div>
+            <div style="font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Domain</div>
+            <div style="font-size:.875rem;color:var(--text-primary);margin-top:.2rem">{{ alumni_profile.domain }}</div>
+          </div>
+          {% endif %}
+          <div>
+            <div style="font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Mentoring</div>
+            <div style="font-size:.875rem;margin-top:.2rem">
+              {% if alumni_profile.is_open_to_mentor %}
+                <span style="color:var(--success)">✓ Open to Mentor</span>
+              {% else %}
+                <span style="color:var(--text-dim)">Not currently mentoring</span>
+              {% endif %}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Branch</div>
+            <div style="font-size:.875rem;color:var(--text-primary);margin-top:.2rem">{{ alumni_profile.branch }}</div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- Alumni Posts -->
+    {% if profile_user.role == 'alumni' and posts %}
+    <div class="glass-card-flat p-4 animate-rise-2">
+      <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:1rem">Posted Opportunities</h3>
+      {% for post in posts %}
+      <div class="post-card mb-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge-glass badge-{{ post.post_type }}">{{ post.get_post_type_display }}</span>
+          <span style="font-size:.72rem;color:var(--text-dim)">{{ post.created_at|date:"M d, Y" }}</span>
+        </div>
+        <div class="post-title">{{ post.title }}</div>
+        <div class="post-meta">
+          {% if post.company %}{{ post.company }}{% endif %}
+          {% if post.location %}· {{ post.location }}{% endif %}
+        </div>
+        <p style="font-size:.85rem;color:var(--text-muted);margin-top:.5rem;line-height:1.6">{{ post.content|truncatechars:120 }}</p>
+        {% if post.link %}
+        <a href="{{ post.link }}" target="_blank" class="btn-ghost-glass mt-2" style="font-size:.8rem;padding:.4rem .9rem">
+          Apply <i class="bi bi-arrow-up-right"></i>
+        </a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

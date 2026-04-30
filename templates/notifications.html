@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Notifications — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrap">
+  <div class="container" style="max-width:700px">
+
+    <div class="dashboard-header animate-rise">
+      <div class="section-eyebrow">Activity</div>
+      <h1 class="dashboard-greeting">Notifications</h1>
+    </div>
+
+    {% if notifications %}
+      <div class="animate-rise-1">
+        {% for notif in notifications %}
+        <div class="glass-card-flat p-3 mb-2 d-flex align-items-center gap-3" style="{% if not notif.is_read %}border-color:rgba(0,200,255,0.2);{% endif %}">
+          <div style="font-size:1.4rem;flex-shrink:0">
+            {% if notif.notif_type == 'mentorship_accepted' %}✅
+            {% elif notif.notif_type == 'mentorship_rejected' %}❌
+            {% elif notif.notif_type == 'mentorship_request' %}📬
+            {% elif notif.notif_type == 'new_message' %}💬
+            {% elif notif.notif_type == 'account_approved' %}🎉
+            {% else %}🔔{% endif %}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:.9rem;color:var(--text-primary)">{{ notif.title }}</div>
+            <div style="font-size:.82rem;color:var(--text-muted);line-height:1.5;margin-top:.2rem">{{ notif.message }}</div>
+            <div style="font-size:.72rem;color:var(--text-dim);margin-top:.3rem">{{ notif.created_at|date:"M d, Y · H:i" }}</div>
+          </div>
+          {% if notif.link %}
+          <a href="{{ notif.link }}" class="btn-ghost-glass" style="font-size:.8rem;padding:.4rem .9rem;flex-shrink:0">
+            View →
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state animate-rise-1">
+        <div class="empty-state-icon">🔔</div>
+        <div class="empty-state-title">You're All Caught Up</div>
+        <div class="empty-state-text">No new notifications. Activity from mentorship requests and messages will appear here.</div>
+        <a href="{% url 'dashboard' %}" class="btn-ghost-glass">Back to Dashboard</a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

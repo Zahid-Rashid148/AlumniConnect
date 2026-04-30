@@ -1,0 +1,118 @@
+{% extends 'base.html' %} {% block title %}Messages — AlumniConnect®{% endblock
+%} {% block content %}
+<div class="dashboard-wrap">
+  <div class="container" style="max-width: 780px">
+    <div class="dashboard-header animate-rise">
+      <div class="section-eyebrow">Inbox</div>
+      <h1 class="dashboard-greeting">Your Conversations</h1>
+      <p class="dashboard-subtitle">Messages with your mentors and mentees.</p>
+    </div>
+
+    {% if chat_list %}
+    <div class="glass-card-flat animate-rise-1" style="overflow: hidden">
+      {% for item in chat_list %}
+      <a
+        href="{% url 'chat' item.user.id %}"
+        style="text-decoration: none; display: block"
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--glass-border);
+            transition: var(--transition);
+            position: relative;
+          "
+          onmouseover="this.style.background = 'var(--accent-soft)'"
+          onmouseout="this.style.background = 'transparent'"
+        >
+          <!-- Avatar -->
+          <div class="user-avatar">
+            {% if item.user.avatar %}
+            <img src="{{ item.user.avatar.url }}" alt="" />
+            {% else %} {{ item.user.display_name|first|upper }} {% endif %}
+          </div>
+
+          <!-- Info -->
+          <div style="flex: 1; min-width: 0">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                gap: 8px;
+              "
+            >
+              <span
+                style="font-weight:{% if item.unread %}700{% else %}500{% endif %};color:var(--text-primary);font-size:.95rem"
+              >
+                {{ item.user.display_name }}
+              </span>
+              {% if item.last_message %}
+              <span
+                style="
+                  font-size: 0.72rem;
+                  color: var(--text-dim);
+                  white-space: nowrap;
+                "
+              >
+                {{ item.last_message.created_at|date:"M j, g:i A" }}
+              </span>
+              {% endif %}
+            </div>
+            <div
+              style="
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 2px;
+              "
+            >
+              {% if item.user.role == 'alumni' and item.user.alumni_profile %}
+              {{ item.user.alumni_profile.company }} · {{
+              item.user.alumni_profile.role }} {% elif item.user.role ==
+              'student' and item.user.student_profile %} {{
+              item.user.student_profile.branch }} · Year {{
+              item.user.student_profile.year }} {% else %} {{
+              item.user.get_role_display }} {% endif %}
+            </div>
+            {% if item.last_message %}
+            <div
+              style="font-size:.78rem;color:{% if item.unread %}var(--text-primary){% else %}var(--text-dim){% endif %};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px"
+            >
+              {% if item.last_message.sender == request.user %}You: {% endif %}
+              {{ item.last_message.content|truncatechars:50 }}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Arrow -->
+          <i
+            class="bi bi-chevron-right"
+            style="color: var(--text-dim); font-size: 0.85rem; flex-shrink: 0"
+          ></i>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">💬</div>
+      <div class="empty-state-title">No Conversations Yet</div>
+      <div class="empty-state-text">
+        Once a mentorship request is accepted, you'll be able to message each
+        other here.
+      </div>
+      <a href="{% url 'alumni_list' %}" class="btn-primary-glass"
+        >Find a Mentor</a
+      >
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrap">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="dashboard-header animate-rise">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <div class="section-eyebrow">Admin Control Panel</div>
+          <h1 class="dashboard-greeting">System Overview <span style="color:var(--danger)">⬡</span></h1>
+          <p class="dashboard-subtitle">Manage users, verify registrations, and monitor platform activity.</p>
+        </div>
+        <a href="/admin/" class="btn-primary-glass" style="background:linear-gradient(135deg,var(--danger),#cc003c)">
+          <i class="bi bi-gear-fill"></i> Django Admin
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-5 animate-rise-1">
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <span class="stat-icon" style="color:var(--gold)">⏳</span>
+          <div class="stat-value" style="color:var(--gold)">{{ stats.pending }}</div>
+          <div class="stat-label">Pending Approvals</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <span class="stat-icon">🎓</span>
+          <div class="stat-value">{{ stats.students }}</div>
+          <div class="stat-label">Total Students</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <span class="stat-icon">💼</span>
+          <div class="stat-value">{{ stats.alumni }}</div>
+          <div class="stat-label">Total Alumni</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <span class="stat-icon" style="color:var(--success)">🤝</span>
+          <div class="stat-value" style="color:var(--success)">{{ stats.mentorships }}</div>
+          <div class="stat-label">Active Mentorships</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <span class="stat-icon">📋</span>
+          <div class="stat-value">{{ stats.posts }}</div>
+          <div class="stat-label">Total Posts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="glass-card-flat p-4 mb-4 animate-rise-2">
+      <h3 style="font-family:'Instrument Serif',serif;font-size:1.3rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem">
+        Pending Approvals
+        {% if stats.pending > 0 %}
+          <span class="notif-badge" style="background:var(--gold);color:#1a0e00">{{ stats.pending }}</span>
+        {% endif %}
+      </h3>
+      {% if pending_users %}
+        <div style="overflow-x:auto">
+          <table class="table-glass">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Details</th>
+                <th>Registered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in pending_users %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="user-avatar" style="width:32px;height:32px;font-size:.85rem;flex-shrink:0">{{ u.display_name|first|upper }}</div>
+                    <div>
+                      <div style="font-weight:600;font-size:.875rem">{{ u.display_name }}</div>
+                      <div style="font-size:.75rem;color:var(--text-muted)">{{ u.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge-glass {% if u.role == 'student' %}badge-job{% else %}badge-internship{% endif %}">
+                    {{ u.get_role_display }}
+                  </span>
+                </td>
+                <td style="font-size:.8rem;color:var(--text-muted)">
+                  {% if u.role == 'student' and u.student_profile %}
+                    {{ u.student_profile.branch }} · Y{{ u.student_profile.year }}
+                  {% elif u.role == 'alumni' and u.alumni_profile %}
+                    {{ u.alumni_profile.company }} · {{ u.alumni_profile.role }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td style="font-size:.8rem;color:var(--text-muted)">{{ u.created_at|date:"M d, Y" }}</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'approve_user' u.id %}" class="btn-success-glass" style="font-size:.78rem;padding:.35rem .8rem">
+                      <i class="bi bi-check-lg"></i> Approve
+                    </a>
+                    <a href="{% url 'reject_user' u.id %}"
+                       class="btn-danger-glass"
+                       style="font-size:.78rem;padding:.35rem .8rem"
+                       data-confirm="Reject {{ u.display_name }}?">
+                      <i class="bi bi-x-lg"></i> Reject
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state" style="padding:2rem">
+          <div class="empty-state-icon">✅</div>
+          <div class="empty-state-title">All Clear!</div>
+          <div class="empty-state-text">No pending registrations at this time.</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="row g-4">
+
+      <!-- All Students -->
+      <div class="col-lg-6">
+        <div class="glass-card-flat p-4 animate-rise-3">
+          <h3 style="font-family:'Instrument Serif',serif;font-size:1.1rem;margin-bottom:1rem">
+            All Students <span style="font-size:.75rem;color:var(--text-muted);font-family:'Inter',sans-serif">({{ all_students.count }})</span>
+          </h3>
+          <div style="max-height:320px;overflow-y:auto">
+            {% for u in all_students %}
+            <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+              <div class="d-flex align-items-center gap-2">
+                <div class="user-avatar" style="width:30px;height:30px;font-size:.8rem;flex-shrink:0">{{ u.display_name|first|upper }}</div>
+                <div>
+                  <div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">{{ u.display_name }}</div>
+                  {% if u.student_profile %}
+                  <div style="font-size:.72rem;color:var(--text-muted)">{{ u.student_profile.branch }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <span class="badge-glass badge-{{ u.status }}">{{ u.get_status_display }}</span>
+            </div>
+            {% empty %}
+            <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:.85rem">No students registered yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- All Alumni -->
+      <div class="col-lg-6">
+        <div class="glass-card-flat p-4 animate-rise-3">
+          <h3 style="font-family:'Instrument Serif',serif;font-size:1.1rem;margin-bottom:1rem">
+            All Alumni <span style="font-size:.75rem;color:var(--text-muted);font-family:'Inter',sans-serif">({{ all_alumni.count }})</span>
+          </h3>
+          <div style="max-height:320px;overflow-y:auto">
+            {% for u in all_alumni %}
+            <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+              <div class="d-flex align-items-center gap-2">
+                <div class="user-avatar" style="width:30px;height:30px;font-size:.8rem;flex-shrink:0;background:linear-gradient(135deg,var(--gold),#c8910a)">{{ u.display_name|first|upper }}</div>
+                <div>
+                  <div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">{{ u.display_name }}</div>
+                  {% if u.alumni_profile %}
+                  <div style="font-size:.72rem;color:var(--text-muted)">{{ u.alumni_profile.company }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <span class="badge-glass badge-{{ u.status }}">{{ u.get_status_display }}</span>
+            </div>
+            {% empty %}
+            <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:.85rem">No alumni registered yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- All Mentorships -->
+    <div class="glass-card-flat p-4 mt-4 animate-rise-4">
+      <h3 style="font-family:'Instrument Serif',serif;font-size:1.1rem;margin-bottom:1rem">All Mentorship Connections</h3>
+      {% if all_mentorships %}
+        <div style="overflow-x:auto">
+          <table class="table-glass">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Alumni</th>
+                <th>Status</th>
+                <th>Requested</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in all_mentorships %}
+              <tr>
+                <td style="font-size:.875rem">{{ m.student.display_name }}</td>
+                <td style="font-size:.875rem">{{ m.alumni.display_name }}</td>
+                <td><span class="badge-glass badge-{{ m.status }}">{{ m.get_status_display }}</span></td>
+                <td style="font-size:.8rem;color:var(--text-muted)">{{ m.created_at|date:"M d, Y" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state" style="padding:2rem">
+          <div class="empty-state-icon">🔗</div>
+          <div class="empty-state-title">No Mentorship Connections Yet</div>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

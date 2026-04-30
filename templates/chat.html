@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Chat with {{ other_user.display_name }} — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div style="padding:1rem 0;height:calc(100vh - 70px);display:flex;flex-direction:column">
+  <div class="container" style="flex:1;display:flex;flex-direction:column;min-height:0">
+
+    <div class="chat-wrap" style="flex:1">
+
+      <!-- Sidebar: back + info -->
+      <div class="chat-sidebar">
+        <div class="chat-sidebar-header">
+          <a href="{% url 'inbox' %}" style="color:var(--text-muted);font-size:.85rem">
+            <i class="bi bi-arrow-left"></i> All Messages
+          </a>
+        </div>
+
+        <!-- Other user info -->
+        <div style="padding:1.25rem;border-bottom:1px solid var(--glass-border)">
+          <div class="d-flex align-items-center gap-3">
+            <div class="user-avatar" style="width:44px;height:44px;font-size:1.1rem">{{ other_user.display_name|first|upper }}</div>
+            <div>
+              <div style="font-weight:600;font-size:.9rem;color:var(--text-primary)">{{ other_user.display_name }}</div>
+              <div style="font-size:.75rem;color:var(--text-muted)">{{ other_user.get_role_display }}</div>
+              {% if other_user.role == 'alumni' and other_user.alumni_profile %}
+              <div style="font-size:.75rem;color:var(--accent)">{{ other_user.alumni_profile.company }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile link -->
+        <div style="padding:1rem">
+          <a href="{% url 'view_profile' other_user.id %}" class="btn-ghost-glass w-100 justify-content-center" style="font-size:.8rem">
+            <i class="bi bi-person"></i> View Profile
+          </a>
+          {% if other_user.linkedin %}
+          <a href="{{ other_user.linkedin }}" target="_blank" class="btn-ghost-glass w-100 justify-content-center mt-2" style="font-size:.8rem">
+            <i class="bi bi-linkedin"></i> LinkedIn
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Chat Main -->
+      <div class="chat-main">
+
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <div class="user-avatar" style="width:36px;height:36px;font-size:.9rem">{{ other_user.display_name|first|upper }}</div>
+          <div>
+            <div style="font-weight:600;font-size:.9rem;color:var(--text-primary)">{{ other_user.display_name }}</div>
+            <div style="font-size:.72rem;color:var(--success)">● Active Mentorship</div>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" id="chat-messages">
+          {% if messages %}
+            {% for msg in messages %}
+            <div style="display:flex;flex-direction:column;align-items:{% if msg.sender == request.user %}flex-end{% else %}flex-start{% endif %}">
+              <div class="message-bubble {% if msg.sender == request.user %}sent{% else %}received{% endif %}">
+                {{ msg.content }}
+              </div>
+              <div class="message-time">{{ msg.created_at|date:"M d" }} · {{ msg.created_at|time:"H:i" }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state" style="padding:3rem">
+              <div class="empty-state-icon">👋</div>
+              <div class="empty-state-title">Start the conversation</div>
+              <div class="empty-state-text">Say hello to {{ other_user.display_name }}!</div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Input Area -->
+        <div class="chat-input-area">
+          <form method="post" id="chat-form" style="display:contents">
+            {% csrf_token %}
+            <textarea name="content" class="message-input" id="message-input"
+                      placeholder="Type a message... (Ctrl+Enter to send)"
+                      rows="1" required></textarea>
+            <button type="submit" class="btn-primary-glass" style="padding:.65rem 1.25rem;flex-shrink:0">
+              <i class="bi bi-send-fill"></i>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Auto-scroll to bottom on load
+const chatMessages = document.getElementById('chat-messages');
+if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+
+// Auto-resize textarea
+const input = document.getElementById('message-input');
+if (input) {
+  input.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+  input.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      document.getElementById('chat-form').submit();
+    }
+  });
+}
+</script>
+{% endblock %}
+{% endblock %}

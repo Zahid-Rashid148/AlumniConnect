@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Edit Profile — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh;padding:3rem 0">
+  <div class="container" style="max-width:640px">
+    <div class="form-glass">
+
+      <div class="mb-4">
+        <div class="section-eyebrow">Account</div>
+        <h1 style="font-family:'Instrument Serif',serif;font-size:1.8rem;margin-bottom:.25rem">Edit Profile</h1>
+        <p style="color:var(--text-muted);font-size:.875rem">Update your information and profile photo.</p>
+      </div>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Avatar Upload -->
+        <div class="form-group-glass">
+          <label class="form-label-glass">Profile Photo</label>
+          <div style="display:flex;align-items:center;gap:1.5rem;padding:1rem;background:rgba(0,0,0,0.2);border-radius:var(--radius-md);border:1px solid var(--glass-border)">
+
+            <!-- Current Avatar Preview -->
+            <div id="avatar-preview" style="width:72px;height:72px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border);background:linear-gradient(135deg,var(--accent),#0055aa);display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:1.6rem;color:#fff">
+              {% if request.user.avatar %}
+                <img src="{{ request.user.avatar.url }}" alt="Avatar" style="width:100%;height:100%;object-fit:cover">
+              {% else %}
+                {{ request.user.display_name|first|upper }}
+              {% endif %}
+            </div>
+
+            <div style="flex:1">
+              <label for="avatar-input" class="btn-ghost-glass" style="cursor:pointer;font-size:.85rem;display:inline-flex;align-items:center;gap:6px">
+                <i class="bi bi-camera"></i> Choose Photo
+              </label>
+              <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display:none">
+              <div style="font-size:.75rem;color:var(--text-dim);margin-top:.4rem">
+                JPG, PNG or GIF · Max 5MB
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Name Row -->
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">First Name</label>
+              <input type="text" name="first_name" class="form-control-glass"
+                     value="{{ form.first_name.value|default_if_none:'' }}" required>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Last Name</label>
+              <input type="text" name="last_name" class="form-control-glass"
+                     value="{{ form.last_name.value|default_if_none:'' }}" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Bio</label>
+          <textarea name="bio" class="form-control-glass" rows="3"
+                    placeholder="Tell others about yourself...">{{ form.bio.value|default_if_none:'' }}</textarea>
+        </div>
+
+        {% if request.user.role == 'student' %}
+          <div class="row g-3">
+            <div class="col-sm-8">
+              <div class="form-group-glass">
+                <label class="form-label-glass">Branch</label>
+                <input type="text" name="branch" class="form-control-glass"
+                       value="{{ form.branch.value|default_if_none:'' }}" required>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group-glass">
+                <label class="form-label-glass">Year</label>
+                <select name="year" class="form-control-glass">
+                  {% for y in "1234" %}
+                    <option value="{{ y }}" {% if form.year.value|stringformat:"s" == y %}selected{% endif %}>
+                      Year {{ y }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group-glass">
+            <label class="form-label-glass">Roll Number</label>
+            <input type="text" name="roll_number" class="form-control-glass"
+                   value="{{ form.roll_number.value|default_if_none:'' }}" placeholder="CS2024001">
+          </div>
+
+          <div class="form-group-glass">
+            <label class="form-label-glass">Skills (comma-separated)</label>
+            <input type="text" name="skills" class="form-control-glass"
+                   value="{{ form.skills.value|default_if_none:'' }}"
+                   placeholder="Python, Django, React...">
+            <div id="skills-preview" style="margin-top:6px"></div>
+          </div>
+
+          <div class="form-group-glass">
+            <label class="form-label-glass">Phone</label>
+            <input type="text" name="phone" class="form-control-glass"
+                   value="{{ form.phone.value|default_if_none:'' }}" placeholder="+91 99999 99999">
+          </div>
+
+        {% elif request.user.role == 'alumni' %}
+          <div class="row g-3">
+            <div class="col-sm-8">
+              <div class="form-group-glass">
+                <label class="form-label-glass">Company</label>
+                <input type="text" name="company" class="form-control-glass"
+                       value="{{ form.company.value|default_if_none:'' }}" required>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group-glass">
+                <label class="form-label-glass">Years Exp.</label>
+                <input type="number" name="experience_years" class="form-control-glass"
+                       value="{{ form.experience_years.value|default_if_none:'' }}" min="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group-glass">
+            <label class="form-label-glass">Job Title</label>
+            <input type="text" name="role" class="form-control-glass"
+                   value="{{ form.role.value|default_if_none:'' }}" required>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="form-group-glass">
+                <label class="form-label-glass">Branch</label>
+                <input type="text" name="branch" class="form-control-glass"
+                       value="{{ form.branch.value|default_if_none:'' }}" required>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group-glass">
+                <label class="form-label-glass">Graduation Year</label>
+                <input type="number" name="graduation_year" class="form-control-glass"
+                       value="{{ form.graduation_year.value|default_if_none:'' }}">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group-glass">
+            <label class="form-label-glass">Domain</label>
+            <input type="text" name="domain" class="form-control-glass"
+                   value="{{ form.domain.value|default_if_none:'' }}"
+                   placeholder="AI, Finance, Product Management">
+          </div>
+
+          <div class="form-group-glass">
+            <label class="form-label-glass">Skills (comma-separated)</label>
+            <input type="text" name="skills" class="form-control-glass"
+                   value="{{ form.skills.value|default_if_none:'' }}"
+                   placeholder="Leadership, Python, System Design...">
+            <div id="skills-preview" style="margin-top:6px"></div>
+          </div>
+
+          <div class="form-group-glass">
+            <label class="form-label-glass">LinkedIn URL</label>
+            <input type="url" name="linkedin" class="form-control-glass"
+                   value="{{ form.linkedin.value|default_if_none:'' }}"
+                   placeholder="https://linkedin.com/in/yourprofile">
+          </div>
+
+          <div class="form-group-glass d-flex align-items-center gap-3">
+            <input type="checkbox" name="is_open_to_mentor" id="mentor_check"
+                   {% if form.is_open_to_mentor.value %}checked{% endif %}
+                   style="width:18px;height:18px;accent-color:var(--accent)">
+            <label for="mentor_check" style="color:var(--text-muted);font-size:.875rem;cursor:pointer">
+              I'm open to mentoring students
+            </label>
+          </div>
+        {% endif %}
+
+        <div class="d-flex gap-2 mt-3">
+          <button type="submit" class="btn-primary-glass">
+            <i class="bi bi-check-lg"></i> Save Changes
+          </button>
+          <a href="{% url 'profile' %}" class="btn-ghost-glass">Cancel</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Live avatar preview
+document.getElementById('avatar-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const preview = document.getElementById('avatar-preview');
+    preview.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+  };
+  reader.readAsDataURL(file);
+});
+</script>
+{% endblock %}

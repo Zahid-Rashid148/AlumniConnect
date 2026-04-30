@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Post Opportunity — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh;padding:4rem 0">
+  <div class="container" style="max-width:620px">
+    <div class="form-glass animate-rise">
+      <div class="section-eyebrow">Alumni Board</div>
+      <h1 style="font-family:'Instrument Serif',serif;font-size:1.8rem;margin-bottom:.5rem">Share an Opportunity</h1>
+      <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:2rem">Post job openings, internships, or events for students in your network.</p>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Opportunity Type</label>
+          <select name="post_type" class="form-control-glass" required>
+            <option value="job">💼 Job</option>
+            <option value="internship">🎓 Internship</option>
+            <option value="event">📅 Event</option>
+            <option value="general">📢 General Announcement</option>
+          </select>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Title</label>
+          <input type="text" name="title" class="form-control-glass" placeholder="Software Engineer Intern @ Google" required>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-7">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Company</label>
+              <input type="text" name="company" class="form-control-glass" placeholder="Company Name">
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Location</label>
+              <input type="text" name="location" class="form-control-glass" placeholder="Remote / City">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Description</label>
+          <textarea name="content" class="form-control-glass" rows="5"
+                    placeholder="Describe the role, requirements, and what students can expect..."
+                    required></textarea>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Application Deadline</label>
+              <input type="date" name="deadline" class="form-control-glass">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Apply Link</label>
+              <input type="url" name="link" class="form-control-glass" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-3">
+          <button type="submit" class="btn-primary-glass flex-grow-1 justify-content-center">
+            <i class="bi bi-send-fill"></i> Publish Post
+          </button>
+          <a href="{% url 'dashboard' %}" class="btn-ghost-glass">
+            <i class="bi bi-x"></i> Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Student Login — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 20%,rgba(0,200,255,0.06) 0%,transparent 60%)"></div>
+
+  <div class="auth-card">
+    <div class="auth-logo">AlumniConnect®</div>
+    <div class="auth-role-badge">
+      <i class="bi bi-mortarboard-fill"></i> Student Portal
+    </div>
+    <h1 class="auth-title">Welcome Back</h1>
+    <p class="auth-subtitle">Sign in to access your dashboard and mentors</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group-glass">
+        <label class="form-label-glass">Username</label>
+        <input type="text" name="username" class="form-control-glass" placeholder="your_username" autocomplete="username" required>
+      </div>
+      <div class="form-group-glass">
+        <label class="form-label-glass">Password</label>
+        <input type="password" name="password" class="form-control-glass" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2">
+        <i class="bi bi-arrow-right-circle"></i> Sign In as Student
+      </button>
+    </form>
+
+    <div style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--text-muted)">
+      Don't have an account?
+      <a href="{% url 'register_student' %}" style="color:var(--accent);font-weight:600"> Register here</a>
+    </div>
+
+    <div style="text-align:center;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--glass-border)">
+      <a href="{% url 'login_alumni' %}" style="font-size:.8rem;color:var(--text-dim)">Login as Alumni →</a>
+      &nbsp;·&nbsp;
+      <a href="{% url 'login_admin' %}" style="font-size:.8rem;color:var(--text-dim)">Admin →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

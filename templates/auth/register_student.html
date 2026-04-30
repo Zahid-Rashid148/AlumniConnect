@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Student Registration — AlumniConnect®{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh;padding:4rem 0;position:relative">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 20%,rgba(0,200,255,0.05) 0%,transparent 60%)"></div>
+
+  <div class="container" style="max-width:640px;position:relative;z-index:1">
+    <div class="form-glass">
+      <div class="text-center mb-4">
+        <div class="auth-logo">AlumniConnect®</div>
+        <div class="auth-role-badge mx-auto" style="width:fit-content">
+          <i class="bi bi-mortarboard-fill"></i> Student Registration
+        </div>
+        <p style="font-size:.875rem;color:var(--text-muted);margin-top:.5rem">Create your student account · Pending admin approval</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">First Name</label>
+              <input type="text" name="first_name" class="form-control-glass" required>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Last Name</label>
+              <input type="text" name="last_name" class="form-control-glass" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Username</label>
+          <input type="text" name="username" class="form-control-glass" required>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Email</label>
+          <input type="email" name="email" class="form-control-glass" required>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-8">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Branch / Department</label>
+              <input type="text" name="branch" class="form-control-glass" placeholder="Computer Science" required>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Year</label>
+              <select name="year" class="form-control-glass" required>
+                <option value="">Year</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Roll Number (optional)</label>
+          <input type="text" name="roll_number" class="form-control-glass" placeholder="CS2024001">
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Skills (comma-separated)</label>
+          <input type="text" name="skills" class="form-control-glass" placeholder="Python, Django, Machine Learning">
+          <div id="skills-preview" style="margin-top:6px"></div>
+        </div>
+
+        <div class="form-group-glass">
+          <label class="form-label-glass">Bio (optional)</label>
+          <textarea name="bio" class="form-control-glass" rows="2" placeholder="Tell alumni about yourself..."></textarea>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Password</label>
+              <input type="password" name="password1" class="form-control-glass" required>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group-glass">
+              <label class="form-label-glass">Confirm Password</label>
+              <input type="password" name="password2" class="form-control-glass" required>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2">
+          <i class="bi bi-person-plus"></i> Create Student Account
+        </button>
+      </form>
+
+      <div style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--text-muted)">
+        Already have an account?
+        <a href="{% url 'login_student' %}" style="color:var(--accent);font-weight:600"> Sign In</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
