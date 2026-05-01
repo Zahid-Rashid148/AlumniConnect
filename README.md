@@ -98,7 +98,7 @@ The platform features distinct login portals to maintain security and tailored u
 
 **Sample Credentials (from seed data):**
 - **Admin**: `Admin` / `Admin@123`
-- **Alumni**: `alumni` / `Test@123`
+- **Alumni**: `alumni1` / `Test@123`
 - **Student**: `student1` / `Test@123`
 - **Student**: `student2` / `basit123`
 
