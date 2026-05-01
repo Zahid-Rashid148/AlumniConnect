@@ -49,6 +49,8 @@ class StudentProfile(models.Model):
 
     @property
     def skills_list(self):
+        if not self.skills:
+            return []
         return [s.strip() for s in self.skills.split(',') if s.strip()]
 
 
@@ -68,6 +70,8 @@ class AlumniProfile(models.Model):
 
     @property
     def skills_list(self):
+        if not self.skills:
+            return []
         return [s.strip() for s in self.skills.split(',') if s.strip()]
 
 

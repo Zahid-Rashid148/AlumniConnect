@@ -1,5 +1,6 @@
-{% extends 'base.html' %} {% block title %}Messages — AlumniConnect®{% endblock
-%} {% block content %}
+{% extends 'base.html' %}
+{% block title %}Messages — AlumniConnect®{% endblock %}
+{% block content %}
 <div class="dashboard-wrap">
   <div class="container" style="max-width: 780px">
     <div class="dashboard-header animate-rise">
@@ -73,12 +74,12 @@
               "
             >
               {% if item.user.role == 'alumni' and item.user.alumni_profile %}
-              {{ item.user.alumni_profile.company }} · {{
-              item.user.alumni_profile.role }} {% elif item.user.role ==
-              'student' and item.user.student_profile %} {{
-              item.user.student_profile.branch }} · Year {{
-              item.user.student_profile.year }} {% else %} {{
-              item.user.get_role_display }} {% endif %}
+              {{ item.user.alumni_profile.company }} · {{ item.user.alumni_profile.role }}
+              {% elif item.user.role == 'student' and item.user.student_profile %}
+              {{ item.user.student_profile.branch }} · Year {{ item.user.student_profile.year }}
+              {% else %}
+              {{ item.user.get_role_display }}
+              {% endif %}
             </div>
             {% if item.last_message %}
             <div

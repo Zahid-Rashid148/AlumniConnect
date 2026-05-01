@@ -1,260 +1,174 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}AlumniConnect®{% endblock %}</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    />
-    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-    {% block extra_head %}{% endblock %}
-  </head>
-  <body>
-    <!-- Page Loader -->
-    <div id="page-loader">
-      <div class="loader-logo">
-        AlumniConnect<span style="font-size: 0.6em; color: var(--text-muted)"
-          >®</span
-        >
-      </div>
-      <div class="loader-bar"></div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}AlumniConnect®{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}blur-bg{% endblock %}">
+  <!-- Cinematic Background -->
+  <div class="cinematic-bg">
+    <img src="{% static 'images/campus_bg.png' %}" alt="Campus Background">
+  </div>
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="loader-logo">
+      AlumniConnect<span style="font-size: 0.6em; color: var(--text-muted)">®</span>
     </div>
+    <div class="loader-bar"></div>
+  </div>
 
-    <!-- Navbar -->
-    <nav class="navbar-glass">
-      <div class="container">
-        <div class="d-flex align-items-center justify-content-between w-100">
-          <!-- Brand -->
-          <a
-            href="{% url 'home' %}"
-            class="navbar-brand-text d-flex align-items-center gap-2"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <circle
-                cx="12"
-                cy="8"
-                r="4"
-                stroke="#00c8ff"
-                stroke-width="1.5"
-              />
-              <path
-                d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-                stroke="#00c8ff"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-            </svg>
-            Alumni<span>Connect</span>®
-          </a>
+  <!-- Navbar -->
+  <nav class="navbar-glass">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between w-100">
+        <!-- Brand -->
+        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="navbar-brand-text d-flex align-items-center gap-2">
+          <img src="/static/images/sdm_logo_untouched.png" alt="SDM Logo" style="height: 48px; width: auto; border-radius: 12px; margin-right: 8px;">
+          <div style="display: flex; align-items: baseline;">
+            Alumni<span style="color: #A1A1AA;">Connect</span>®
+          </div>
+        </a>
 
-          <!-- Nav Links -->
-          <div class="d-none d-md-flex align-items-center gap-1">
-            <a
-              href="{% url 'home' %}"
-              class="nav-link-glass {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-              >Home</a
-            >
-            {% if user.is_authenticated %}
-            <a
-              href="{% url 'dashboard' %}"
-              class="nav-link-glass {% if 'dashboard' in request.path %}active{% endif %}"
-              >Dashboard</a
-            >
-            <a href="{% url 'alumni_list' %}" class="nav-link-glass">Alumni</a>
-            <a href="{% url 'posts_list' %}" class="nav-link-glass"
-              >Opportunities</a
-            >
-            <a href="{% url 'inbox' %}" class="nav-link-glass">
-              Messages {% with unread=user.received_messages.filter %}{% endwith
-              %}
+        <!-- Nav Links -->
+        <div class="d-none d-md-flex align-items-center gap-1">
+          {% if user.is_authenticated %}
+            <!-- Logged In Links -->
+            <a href="{% url 'dashboard' %}"
+              class="nav-link-glass {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+              <i class="bi bi-grid-fill" style="font-size: 0.9rem; margin-right: 4px;"></i> Dashboard
             </a>
-            <a href="{% url 'notifications' %}" class="nav-link-glass">
-              <i class="bi bi-bell"></i>
-            </a>
+            <a href="{% url 'alumni_list' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'alumni_list' %}active{% endif %}">Alumni</a>
+            <a href="{% url 'posts_list' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'posts_list' %}active{% endif %}">Opportunities</a>
+            <a href="{% url 'inbox' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'inbox' or request.resolver_match.url_name == 'chat' %}active{% endif %}">Messages</a>
+            
             <div class="dropdown ms-2">
-              <button
-                class="btn-ghost-glass dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-              >
-                <img
-                  src="{{ user.avatar.url }}"
-                  style="
-                    width: 26px;
-                    height: 26px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 1px solid var(--border);
-                  "
-                />
+              <button class="btn-ghost-glass dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);" />
                 {% else %}
-                <span
-                  style="
-                    width: 26px;
-                    height: 26px;
-                    border-radius: 50%;
-                    background: linear-gradient(135deg, var(--accent), #0055aa);
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                    color: #fff;
-                  "
-                  >{{ user.display_name|first|upper }}</span
-                >
-                {% endif %} {{ user.display_name|truncatechars:15 }}
+                <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #fff;">{{ user.display_name|first|upper }}</span>
+                {% endif %} {{ user.display_name|truncatechars:12 }}
               </button>
-              <ul
-                class="dropdown-menu dropdown-menu-end"
-                style="
-                  background: var(--bg-dark);
-                  border: 1px solid var(--glass-border);
-                  border-radius: var(--radius-md);
-                "
-              >
-                <li>
-                  <a
-                    class="dropdown-item"
-                    href="{% url 'profile' %}"
-                    style="color: var(--text-muted); font-size: 0.875rem"
-                    >My Profile</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
-                    href="{% url 'edit_profile' %}"
-                    style="color: var(--text-muted); font-size: 0.875rem"
-                    >Edit Profile</a
-                  >
-                </li>
-                <li>
-                  <hr
-                    class="dropdown-divider"
-                    style="border-color: var(--glass-border)"
-                  />
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
-                    href="{% url 'logout' %}"
-                    style="color: var(--danger); font-size: 0.875rem"
-                    >Sign Out</a
-                  >
-                </li>
+              <ul class="dropdown-menu dropdown-menu-end" style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-md);">
+                <li><a class="dropdown-item" href="{% url 'profile' %}" style="color: var(--text-muted); font-size: 0.875rem">My Profile</a></li>
+                <li><a class="dropdown-item" href="{% url 'edit_profile' %}" style="color: var(--text-muted); font-size: 0.875rem">Edit Settings</a></li>
+                <li><hr class="dropdown-divider" style="border-color: var(--glass-border)" /></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}" style="color: var(--danger); font-size: 0.875rem">Sign Out</a></li>
               </ul>
             </div>
-            {% else %}
-            <a href="{% url 'login_student' %}" class="nav-link-glass"
-              >Students</a
-            >
+          {% else %}
+            <!-- Guest Links -->
+            <a href="{% url 'home' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+            <a href="{% url 'login_student' %}" class="nav-link-glass">Students</a>
             <a href="{% url 'login_alumni' %}" class="nav-link-glass">Alumni</a>
-            <a href="{% url 'login_student' %}" class="btn-nav-cta ms-2"
-              >Begin Journey</a
-            >
-            {% endif %}
-          </div>
-
-          <!-- Mobile Toggle -->
-          <button
-            class="navbar-toggler d-md-none"
-            style="
-              background: none;
-              border: 1px solid var(--glass-border);
-              color: var(--text-muted);
-              padding: 6px 10px;
-              border-radius: var(--radius-sm);
-            "
-          >
-            <i class="bi bi-list" style="font-size: 1.2rem"></i>
-          </button>
+            
+            <div class="dropdown ms-2">
+              <button class="btn-nav-cta dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Get Started
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <li><a class="dropdown-item py-2" href="{% url 'register_student' %}" style="color: var(--text-primary); font-size: 0.9rem">
+                  <i class="bi bi-mortarboard me-2"></i> Student Portal
+                </a></li>
+                <li><a class="dropdown-item py-2" href="{% url 'register_alumni' %}" style="color: var(--text-primary); font-size: 0.9rem">
+                  <i class="bi bi-briefcase me-2"></i> Alumni Portal
+                </a></li>
+              </ul>
+            </div>
+          {% endif %}
         </div>
 
-        <!-- Mobile Menu -->
-        <div class="navbar-collapse d-md-none mt-2" style="display: none">
-          <div class="d-flex flex-column gap-1 pb-2">
-            <a href="{% url 'home' %}" class="nav-link-glass">Home</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'dashboard' %}" class="nav-link-glass">Dashboard</a>
-            <a href="{% url 'alumni_list' %}" class="nav-link-glass">Alumni</a>
-            <a href="{% url 'inbox' %}" class="nav-link-glass">Messages</a>
-            <a
-              href="{% url 'logout' %}"
-              class="nav-link-glass"
-              style="color: var(--danger)"
-              >Sign Out</a
-            >
-            {% else %}
-            <a href="{% url 'login_student' %}" class="nav-link-glass"
-              >Student Login</a
-            >
-            <a href="{% url 'login_alumni' %}" class="nav-link-glass"
-              >Alumni Login</a
-            >
-            {% endif %}
-          </div>
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler d-md-none" style="background: none; border: 1px solid var(--glass-border); color: var(--text-muted); padding: 6px 10px; border-radius: var(--radius-sm);">
+          <i class="bi bi-list" style="font-size: 1.2rem"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div class="navbar-collapse d-md-none mt-2" style="display: none">
+        <div class="d-flex flex-column gap-1 pb-2">
+          {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="nav-link-glass">Dashboard</a>
+          <a href="{% url 'alumni_list' %}" class="nav-link-glass">Alumni</a>
+          <a href="{% url 'inbox' %}" class="nav-link-glass">Messages</a>
+          <a href="{% url 'logout' %}" class="nav-link-glass" style="color: var(--danger)">Sign Out</a>
+          {% else %}
+          <a href="{% url 'home' %}" class="nav-link-glass">Home</a>
+          <a href="{% url 'login_student' %}" class="nav-link-glass">Student Login</a>
+          <a href="{% url 'login_alumni' %}" class="nav-link-glass">Alumni Login</a>
+          {% endif %}
         </div>
       </div>
-    </nav>
-
-    <!-- Flash Messages -->
-    {% if messages %}
-    <div class="container mt-3" style="position: relative; z-index: 100">
-      {% for message in messages %}
-      <div
-        class="alert-glass {% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %} mb-2"
-      >
-        <i
-          class="bi {% if message.tags == 'error' %}bi-x-circle{% elif message.tags == 'warning' %}bi-exclamation-triangle{% elif message.tags == 'success' %}bi-check-circle{% else %}bi-info-circle{% endif %}"
-        ></i>
-        {{ message }}
-      </div>
-      {% endfor %}
     </div>
-    {% endif %}
+  </nav>
 
-    <!-- Main Content -->
-    {% block content %}{% endblock %}
+  <!-- Flash Messages -->
+  {% if messages %}
+  <div class="container mt-3" style="position: relative; z-index: 100">
+    {% for message in messages %}
+    <div class="alert-glass {% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %} mb-2">
+      <i class="bi {% if message.tags == 'error' %}bi-x-circle{% elif message.tags == 'warning' %}bi-exclamation-triangle{% elif message.tags == 'success' %}bi-check-circle{% else %}bi-info-circle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-    <!-- Footer -->
-    <footer class="footer-glass">
-      <div class="container">
-        <div
-          class="d-flex flex-wrap justify-content-between align-items-center gap-2"
-        >
-          <span
-            style="
-              font-family: &quot;Instrument Serif&quot;, serif;
-              color: var(--accent);
-            "
-            >AlumniConnect®</span
-          >
-          <span>© 2026 · Connecting Futures, Building Legacies</span>
-          <div class="d-flex gap-3">
-            <a href="#" style="color: var(--text-dim)"
-              ><i class="bi bi-linkedin"></i
-            ></a>
-            <a href="#" style="color: var(--text-dim)"
-              ><i class="bi bi-twitter-x"></i
-            ></a>
-            <a href="#" style="color: var(--text-dim)"
-              ><i class="bi bi-github"></i
-            ></a>
+  <!-- Main Content -->
+  {% block content %}{% endblock %}
+
+  <!-- Profile Modal -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+        <div class="modal-body p-0" id="profileModalBody">
+          <div class="p-5 text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
           </div>
         </div>
       </div>
-    </footer>
+    </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    {% block extra_js %}{% endblock %}
-  </body>
+  <!-- Footer -->
+  <footer class="footer-glass">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span style="font-family: 'Instrument Serif', serif; color: var(--accent);">AlumniConnect®</span>
+        <span>© 2026 · Connecting Futures, Building Legacies</span>
+        <div class="d-flex gap-3">
+          <a href="#" style="color: var(--text-dim)"><i class="bi bi-linkedin"></i></a>
+          <a href="#" style="color: var(--text-dim)"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" style="color: var(--text-dim)"><i class="bi bi-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script>
+    function openProfileModal(userId) {
+      const body = document.getElementById('profileModalBody');
+      body.innerHTML = `<div class="p-5 text-center"><div class="spinner-border text-primary" role="status"></div></div>`;
+      fetch(`/profile/modal/${userId}/`)
+        .then(res => res.text())
+        .then(html => body.innerHTML = html)
+        .catch(err => body.innerHTML = `<div class="p-5 text-center text-danger">Error loading profile.</div>`);
+    }
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+
 </html>

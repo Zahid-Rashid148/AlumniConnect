@@ -3,79 +3,62 @@
 
 {% block title %}AlumniConnect® — Where Futures Connect{% endblock %}
 
+{% block body_class %}clear-bg{% endblock %}
+
 {% block content %}
 
 <!-- ═══ HERO SECTION ═══ -->
 <section class="hero-section">
 
-  <!-- Video Background -->
-  <div class="hero-video-bg">
-    <video autoplay loop muted playsinline>
-      <source src="{% static 'videos/hero.mp4' %}" type="video/mp4">
-    </video>
-  </div>
-
-  <!-- Gradient Overlay -->
-  <div class="hero-overlay"></div>
-
-  <!-- Floating orbs for depth -->
-  <div style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,200,255,0.06) 0%,transparent 70%);top:-100px;right:-100px;z-index:1;pointer-events:none"></div>
-  <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,200,255,0.04) 0%,transparent 70%);bottom:50px;left:-50px;z-index:1;pointer-events:none"></div>
-
   <!-- Hero Content -->
   <div class="container hero-content">
     <div class="row align-items-center">
       <div class="col-lg-7">
+        <div class="hero-content-card">
+          <div class="hero-eyebrow">
+            Platform for Tomorrow's Leaders
+          </div>
 
-        <div class="hero-eyebrow">
-          Platform for Tomorrow's Leaders
-        </div>
+          <h1 class="hero-title">
+            Where Alumni<br>
+            <em class="accent-word">Shape</em> the Future
+          </h1>
 
-        <h1 class="hero-title">
-          Where Alumni<br>
-          <em class="accent-word">Shape</em> the Future
-        </h1>
+          <p class="hero-subtitle">
+            AlumniConnect bridges the gap between experience and ambition. 
+            Students find their mentors. Alumni leave their legacy. 
+            One platform. Infinite possibilities.
+          </p>
 
-        <p class="hero-subtitle">
-          AlumniConnect bridges the gap between experience and ambition.
-          Students find their mentors. Alumni leave their legacy.
-          One platform. Infinite possibilities.
-        </p>
-
-        <div class="hero-actions">
-          <a href="{% url 'login_student' %}" class="btn-primary-glass">
-            <i class="bi bi-mortarboard-fill"></i>
-            I'm a Student
-          </a>
-          <a href="{% url 'login_alumni' %}" class="btn-ghost-glass">
-            <i class="bi bi-briefcase-fill"></i>
-            I'm an Alumni
-          </a>
-          <a href="{% url 'login_admin' %}" class="btn-ghost-glass" style="font-size:0.8rem;padding:0.6rem 1.2rem">
-            <i class="bi bi-shield-lock"></i>
-            Admin
-          </a>
+          <div class="hero-actions">
+            <a href="{% url 'login_student' %}" class="btn-primary-glass">
+              <i class="bi bi-mortarboard"></i> I'm a Student
+            </a>
+            <a href="{% url 'login_alumni' %}" class="btn-primary-glass">
+              <i class="bi bi-briefcase"></i> I'm an Alumni
+            </a>
+          </div>
         </div>
 
         <!-- Stats -->
-        <div class="hero-stats">
+        <div class="hero-stats-bar">
           <div class="hero-stat-item">
-            <span class="hero-stat-number" data-target="{{ stats.total_alumni }}" data-suffix="+">{{ stats.total_alumni }}+</span>
+            <span class="hero-stat-number">{{ stats.total_alumni }}+</span>
             <span class="hero-stat-label">Alumni</span>
           </div>
-          <div style="width:1px;background:var(--glass-border);align-self:stretch"></div>
+          <div class="hero-stat-divider"></div>
           <div class="hero-stat-item">
-            <span class="hero-stat-number" data-target="{{ stats.total_students }}" data-suffix="+">{{ stats.total_students }}+</span>
+            <span class="hero-stat-number">{{ stats.total_students }}+</span>
             <span class="hero-stat-label">Students</span>
           </div>
-          <div style="width:1px;background:var(--glass-border);align-self:stretch"></div>
+          <div class="hero-stat-divider"></div>
           <div class="hero-stat-item">
-            <span class="hero-stat-number" data-target="{{ stats.total_mentorships }}" data-suffix="+">{{ stats.total_mentorships }}+</span>
+            <span class="hero-stat-number">{{ stats.total_mentorships }}+</span>
             <span class="hero-stat-label">Mentorships</span>
           </div>
-          <div style="width:1px;background:var(--glass-border);align-self:stretch"></div>
+          <div class="hero-stat-divider"></div>
           <div class="hero-stat-item">
-            <span class="hero-stat-number" data-target="{{ stats.total_posts }}" data-suffix="">{{ stats.total_posts }}</span>
+            <span class="hero-stat-number">{{ stats.total_posts }}</span>
             <span class="hero-stat-label">Opportunities</span>
           </div>
         </div>
@@ -84,21 +67,24 @@
 
       <!-- Right side visual card -->
       <div class="col-lg-5 d-none d-lg-block">
-        <div style="animation:fade-rise 1s ease 0.5s both">
-          <div class="glass-card p-4" style="border-radius:var(--radius-xl)">
-            <div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem">Recent Activity</div>
+        <div class="hero-activity-card">
+          <div class="activity-header">RECENT ACTIVITY</div>
 
             <div style="display:flex;flex-direction:column;gap:12px">
               {% for post in recent_posts %}
               <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:var(--radius-md);background:rgba(0,0,0,0.2)">
-                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0055aa);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0">
+                <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden">
+                  {% if post.author.avatar %}
+                  <img src="{{ post.author.avatar.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+                  {% else %}
                   {{ post.author.display_name|first|upper }}
+                  {% endif %}
                 </div>
                 <div style="min-width:0">
                   <div style="font-size:0.85rem;color:var(--text-primary);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ post.title }}</div>
                   <div style="font-size:0.72rem;color:var(--text-muted)">
                     <span class="badge-glass badge-{{ post.post_type }}">{{ post.post_type|upper }}</span>
-                    · {{ post.author.display_name }}
+                    · <a href="javascript:void(0)" onclick="openProfileModal('{{ post.author.id }}')" style="color:var(--accent);text-decoration:none">{{ post.author.display_name }}</a>
                   </div>
                 </div>
               </div>
@@ -137,9 +123,19 @@
       {% for step in "123" %}
       <div class="col-md-4">
         <div class="glass-card p-4 text-center h-100 animate-rise-{{ forloop.counter }}">
-          <div style="width:56px;height:56px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(0,200,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--accent)">
-            {{ forloop.counter }}
-          </div>
+          {% if forloop.counter == 1 %}
+            <div style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
+              <img src="{% static 'images/create_profile.png' %}" alt="Create Profile" style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
+            </div>
+          {% elif forloop.counter == 2 %}
+            <div style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
+              <img src="{% static 'images/find_match.png' %}" alt="Find Match" style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
+            </div>
+          {% elif forloop.counter == 3 %}
+            <div style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
+              <img src="{% static 'images/grow_together.png' %}" alt="Grow" style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
+            </div>
+          {% endif %}
           {% if forloop.counter == 1 %}
             <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:.5rem">Create Your Profile</h3>
             <p style="font-size:.875rem;color:var(--text-muted);line-height:1.7">Sign up as a student or alumni. Share your expertise, goals, and background. Admin verifies your account for quality assurance.</p>

@@ -3,13 +3,11 @@
 
 {% block content %}
 <div style="min-height:100vh;padding:4rem 0;position:relative">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 80%,rgba(240,180,41,0.04) 0%,transparent 60%)"></div>
-
   <div class="container" style="max-width:680px;position:relative;z-index:1">
     <div class="form-glass">
       <div class="text-center mb-4">
         <div class="auth-logo">AlumniConnect®</div>
-        <div class="auth-role-badge mx-auto" style="width:fit-content;background:var(--gold-soft);color:var(--gold);border-color:rgba(240,180,41,0.25)">
+        <div class="auth-role-badge mx-auto" style="width:fit-content;background:var(--accent-soft);color:var(--accent);border-color:rgba(0, 200, 255, 0.2)">
           <i class="bi bi-briefcase-fill"></i> Alumni Registration
         </div>
         <p style="font-size:.875rem;color:var(--text-muted);margin-top:.5rem">Share your experience · Mentor the next generation</p>
@@ -112,25 +110,31 @@
           <div class="col-sm-6">
             <div class="form-group-glass">
               <label class="form-label-glass">Password</label>
-              <input type="password" name="password1" class="form-control-glass" required>
+              <div class="position-relative">
+                <input type="password" name="password1" id="reg_alumni_pwd1" class="form-control-glass pe-5" required>
+                <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePassword('reg_alumni_pwd1', this)" style="cursor: pointer; z-index: 10;"></i>
+              </div>
             </div>
           </div>
           <div class="col-sm-6">
             <div class="form-group-glass">
               <label class="form-label-glass">Confirm Password</label>
-              <input type="password" name="password2" class="form-control-glass" required>
+              <div class="position-relative">
+                <input type="password" name="password2" id="reg_alumni_pwd2" class="form-control-glass pe-5" required>
+                <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePassword('reg_alumni_pwd2', this)" style="cursor: pointer; z-index: 10;"></i>
+              </div>
             </div>
           </div>
         </div>
 
-        <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2" style="background:linear-gradient(135deg,var(--gold),#c8910a);color:#1a0e00">
+        <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2">
           <i class="bi bi-person-plus"></i> Create Alumni Account
         </button>
       </form>
 
       <div style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--text-muted)">
         Already have an account?
-        <a href="{% url 'login_alumni' %}" style="color:var(--gold);font-weight:600"> Sign In</a>
+        <a href="{% url 'login_alumni' %}" style="color:var(--accent);font-weight:600"> Sign In</a>
       </div>
     </div>
   </div>

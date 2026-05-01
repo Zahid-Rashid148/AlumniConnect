@@ -28,76 +28,53 @@ def home(request):
 
 # ─── AUTH VIEWS ─────────────────────────────────────────────────────────────
 
-def login_student(request):
+def _handle_login(request, role, template_name):
     if request.user.is_authenticated:
         return redirect('dashboard')
+    
     form = LoginForm()
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(
-                request,
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
-            if user and user.role == 'student':
-                if user.status == 'approved':
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            
+            if user and (user.role == role or (role == 'admin' and user.is_superuser)):
+                if user.status == 'approved' or user.role == 'admin' or user.is_superuser:
+                    # Update last login IP
+                    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+                    if x_forwarded_for:
+                        ip = x_forwarded_for.split(',')[0]
+                    else:
+                        ip = request.META.get('REMOTE_ADDR')
+                    user.last_login_ip = ip
+                    user.save(update_fields=['last_login_ip'])
+                    
                     login(request, user)
                     messages.success(request, f'Welcome back, {user.display_name}!')
-                    return redirect('dashboard')
+                    return redirect('admin_dashboard' if role == 'admin' else 'dashboard')
                 elif user.status == 'pending':
                     messages.warning(request, 'Your account is pending admin approval.')
                 else:
                     messages.error(request, 'Your account has been rejected.')
             else:
-                messages.error(request, 'Invalid credentials or not a student account.')
-    return render(request, 'auth/login_student.html', {'form': form})
+                role_display = 'an alumni' if role == 'alumni' else f'a {role}'
+                messages.error(request, f'Invalid credentials or not {role_display} account.')
+                
+    return render(request, template_name, {'form': form})
+
+
+def login_student(request):
+    return _handle_login(request, 'student', 'auth/login_student.html')
 
 
 def login_alumni(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    form = LoginForm()
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            user = authenticate(
-                request,
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
-            if user and user.role == 'alumni':
-                if user.status == 'approved':
-                    login(request, user)
-                    messages.success(request, f'Welcome back, {user.display_name}!')
-                    return redirect('dashboard')
-                elif user.status == 'pending':
-                    messages.warning(request, 'Your account is pending admin approval.')
-                else:
-                    messages.error(request, 'Your account has been rejected.')
-            else:
-                messages.error(request, 'Invalid credentials or not an alumni account.')
-    return render(request, 'auth/login_alumni.html', {'form': form})
+    return _handle_login(request, 'alumni', 'auth/login_alumni.html')
 
 
 def login_admin(request):
-    if request.user.is_authenticated and request.user.role == 'admin':
-        return redirect('admin_dashboard')
-    form = LoginForm()
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            user = authenticate(
-                request,
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
-            if user and (user.role == 'admin' or user.is_superuser):
-                login(request, user)
-                return redirect('admin_dashboard')
-            else:
-                messages.error(request, 'Invalid admin credentials.')
-    return render(request, 'auth/login_admin.html', {'form': form})
+    return _handle_login(request, 'admin', 'auth/login_admin.html')
 
 
 def register_student(request):
@@ -379,7 +356,7 @@ def inbox(request):
         })
 
     # Sort by latest message first
-    chat_list.sort(key=lambda x: x['last_message'].created_at if x['last_message'] else 0, reverse=True)
+    chat_list.sort(key=lambda x: x['last_message'].created_at if x['last_message'] else timezone.make_aware(timezone.datetime.min), reverse=True)
 
     return render(request, 'inbox.html', {'chat_list': chat_list})
 
@@ -504,6 +481,26 @@ def profile(request, user_id=None):
 
 
 @login_required
+def profile_modal(request, user_id):
+    profile_user = get_object_or_404(User, id=user_id)
+    context = {'profile_user': profile_user}
+
+    if profile_user.role == 'student':
+        try:
+            context['student_profile'] = profile_user.student_profile
+        except StudentProfile.DoesNotExist:
+            context['student_profile'] = None
+    elif profile_user.role == 'alumni':
+        try:
+            context['alumni_profile'] = profile_user.alumni_profile
+            context['posts'] = Post.objects.filter(author=profile_user, is_active=True)
+        except AlumniProfile.DoesNotExist:
+            context['alumni_profile'] = None
+
+    return render(request, 'includes/profile_modal_content.html', context)
+
+
+@login_required
 def edit_profile(request):
     user = request.user
 
@@ -521,15 +518,14 @@ def edit_profile(request):
         }
         form = StudentProfileUpdateForm(instance=sp, initial=initial)
         if request.method == 'POST':
-            form = StudentProfileUpdateForm(request.POST, instance=sp)
+            form = StudentProfileUpdateForm(request.POST, request.FILES, instance=sp)
             if form.is_valid():
                 user.first_name = form.cleaned_data['first_name']
                 user.last_name = form.cleaned_data['last_name']
                 user.bio = form.cleaned_data.get('bio', '')
                 user.phone = form.cleaned_data.get('phone', '')
-                # Handle avatar upload
-                if request.FILES.get('avatar'):
-                    user.avatar = request.FILES['avatar']
+                if form.cleaned_data.get('avatar'):
+                    user.avatar = form.cleaned_data['avatar']
                 user.save()
                 form.save()
                 messages.success(request, 'Profile updated!')
@@ -549,15 +545,14 @@ def edit_profile(request):
         }
         form = AlumniProfileUpdateForm(instance=ap, initial=initial)
         if request.method == 'POST':
-            form = AlumniProfileUpdateForm(request.POST, instance=ap)
+            form = AlumniProfileUpdateForm(request.POST, request.FILES, instance=ap)
             if form.is_valid():
                 user.first_name = form.cleaned_data['first_name']
                 user.last_name = form.cleaned_data['last_name']
                 user.bio = form.cleaned_data.get('bio', '')
                 user.linkedin = form.cleaned_data.get('linkedin', '')
-                # Handle avatar upload
-                if request.FILES.get('avatar'):
-                    user.avatar = request.FILES['avatar']
+                if form.cleaned_data.get('avatar'):
+                    user.avatar = form.cleaned_data['avatar']
                 user.save()
                 form.save()
                 messages.success(request, 'Profile updated!')

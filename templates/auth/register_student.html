@@ -3,8 +3,6 @@
 
 {% block content %}
 <div style="min-height:100vh;padding:4rem 0;position:relative">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 20%,rgba(0,200,255,0.05) 0%,transparent 60%)"></div>
-
   <div class="container" style="max-width:640px;position:relative;z-index:1">
     <div class="form-glass">
       <div class="text-center mb-4">
@@ -83,13 +81,19 @@
           <div class="col-sm-6">
             <div class="form-group-glass">
               <label class="form-label-glass">Password</label>
-              <input type="password" name="password1" class="form-control-glass" required>
+              <div class="position-relative">
+                <input type="password" name="password1" id="reg_student_pwd1" class="form-control-glass pe-5" required>
+                <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePassword('reg_student_pwd1', this)" style="cursor: pointer; z-index: 10;"></i>
+              </div>
             </div>
           </div>
           <div class="col-sm-6">
             <div class="form-group-glass">
               <label class="form-label-glass">Confirm Password</label>
-              <input type="password" name="password2" class="form-control-glass" required>
+              <div class="position-relative">
+                <input type="password" name="password2" id="reg_student_pwd2" class="form-control-glass pe-5" required>
+                <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePassword('reg_student_pwd2', this)" style="cursor: pointer; z-index: 10;"></i>
+              </div>
             </div>
           </div>
         </div>

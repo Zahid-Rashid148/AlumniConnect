@@ -33,6 +33,8 @@ class StudentRegistrationForm(UserCreationForm):
                 roll_number=self.cleaned_data.get('roll_number', ''),
                 skills=self.cleaned_data.get('skills', ''),
             )
+            user.bio = self.cleaned_data.get('bio', '')
+            user.save()
         return user
 
 
@@ -118,7 +120,7 @@ class PostForm(forms.ModelForm):
             'company': forms.TextInput(attrs={'placeholder': 'Company Name'}),
             'location': forms.TextInput(attrs={'placeholder': 'City, Country or Remote'}),
             'deadline': forms.DateInput(attrs={'type': 'date'}),
-            'link': forms.URLField.widget(attrs={'placeholder': 'https://apply.example.com'}),
+            'link': forms.URLInput(attrs={'placeholder': 'https://apply.example.com'}),
         }
 
 
@@ -131,6 +133,8 @@ class StudentProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = StudentProfile
         fields = ['branch', 'year', 'roll_number', 'cgpa', 'skills']
+    
+    avatar = forms.ImageField(required=False)
 
 
 class AlumniProfileUpdateForm(forms.ModelForm):
@@ -142,3 +146,5 @@ class AlumniProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = AlumniProfile
         fields = ['company', 'role', 'experience_years', 'graduation_year', 'branch', 'domain', 'skills', 'is_open_to_mentor']
+
+    avatar = forms.ImageField(required=False)

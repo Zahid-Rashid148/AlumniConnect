@@ -69,9 +69,15 @@
 
             <!-- Author -->
             <div class="d-flex align-items-center gap-2 mb-3">
-              <div class="user-avatar" style="width:28px;height:28px;font-size:.75rem">{{ post.author.display_name|first|upper }}</div>
+              <div class="user-avatar" style="width:28px;height:28px;font-size:.75rem">
+                {% if post.author.avatar %}
+                <img src="{{ post.author.avatar.url }}" alt="">
+                {% else %}
+                {{ post.author.display_name|first|upper }}
+                {% endif %}
+              </div>
               <div style="font-size:.78rem;color:var(--text-muted)">
-                Posted by <a href="{% url 'view_profile' post.author.id %}" style="color:var(--accent);font-weight:500">{{ post.author.display_name }}</a>
+                Posted by <a href="javascript:void(0)" onclick="openProfileModal('{{ post.author.id }}')" style="color:var(--accent);font-weight:500">{{ post.author.display_name }}</a>
               </div>
             </div>
 
@@ -81,7 +87,7 @@
                 Apply Now <i class="bi bi-arrow-up-right"></i>
               </a>
               {% endif %}
-              <a href="{% url 'view_profile' post.author.id %}" class="btn-ghost-glass" style="font-size:.85rem;padding:.5rem 1.1rem">
+              <a href="javascript:void(0)" onclick="openProfileModal('{{ post.author.id }}')" class="btn-ghost-glass" style="font-size:.85rem;padding:.5rem 1.1rem">
                 View Author
               </a>
               {% if request.user == post.author %}

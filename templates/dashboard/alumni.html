@@ -7,42 +7,56 @@
 
     <!-- Header -->
     <div class="dashboard-header animate-rise">
-      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-          <div class="section-eyebrow">Alumni Dashboard</div>
-          <h1 class="dashboard-greeting">Welcome, {{ user.display_name }} ✦</h1>
-          <p class="dashboard-subtitle">Manage your mentees, post opportunities, and shape the next generation.</p>
+          <div class="section-eyebrow">Alumni Workspace</div>
+          <h1 class="dashboard-greeting">Welcome back, {{ user.display_name }} ✦</h1>
+          <p class="dashboard-subtitle">Manage your mentees, share opportunities, and track your impact.</p>
         </div>
-        <a href="{% url 'create_post' %}" class="btn-primary-glass"
-          style="background:linear-gradient(135deg,var(--gold),#c8910a);color:#1a0e00">
-          <i class="bi bi-plus-lg"></i> Post Opportunity
-        </a>
+        <div class="d-flex gap-2">
+          <a href="{% url 'create_post' %}" class="btn-primary-glass">
+            <i class="bi bi-plus-lg"></i> New Post
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- Notifications -->
-    {% if notifications %}
-    <div class="mb-4 animate-rise-1">
-      {% for notif in notifications %}
-      <div class="alert-glass info mb-2">
-        <i class="bi bi-bell-fill"></i> {{ notif.title }} — {{ notif.message }}
-      </div>
-      {% endfor %}
+    <!-- Quick Action Hub -->
+    <div class="action-grid animate-rise-1">
+      <a href="{% url 'create_post' %}" class="action-item">
+        <i class="bi bi-megaphone"></i>
+        <span>Post Opportunity</span>
+      </a>
+      <a href="{% url 'inbox' %}" class="action-item">
+        <i class="bi bi-chat-dots"></i>
+        <span>Messages</span>
+      </a>
+      <a href="{% url 'edit_profile' %}" class="action-item">
+        <i class="bi bi-person-circle"></i>
+        <span>Edit Profile</span>
+      </a>
+      <a href="{% url 'posts_list' %}" class="action-item">
+        <i class="bi bi-clipboard-data"></i>
+        <span>Manage Posts</span>
+      </a>
+      <a href="{% url 'notifications' %}" class="action-item">
+        <i class="bi bi-lightning"></i>
+        <span>Recent Activity</span>
+      </a>
     </div>
-    {% endif %}
 
-    <!-- Stats -->
-    <div class="row g-3 mb-4 animate-rise-1">
+    <!-- Stats Row -->
+    <div class="row g-3 mb-5 animate-rise-1">
       <div class="col-6 col-lg-3">
         <div class="stat-card">
-          <span class="stat-icon">📬</span>
+          <span class="stat-icon" style="color:var(--gold)">📬</span>
           <div class="stat-value">{{ pending_requests.count }}</div>
           <div class="stat-label">Pending Requests</div>
         </div>
       </div>
       <div class="col-6 col-lg-3">
         <div class="stat-card">
-          <span class="stat-icon">👥</span>
+          <span class="stat-icon" style="color:var(--accent)">👥</span>
           <div class="stat-value">{{ accepted_students.count }}</div>
           <div class="stat-label">Active Mentees</div>
         </div>
@@ -58,167 +72,123 @@
         <div class="stat-card">
           <span class="stat-icon">📋</span>
           <div class="stat-value">{{ my_posts.count }}</div>
-          <div class="stat-label">My Posts</div>
+          <div class="stat-label">My Contributions</div>
         </div>
       </div>
     </div>
 
     <div class="row g-4">
       <div class="col-lg-8">
-
-        <!-- Pending Requests -->
+        <!-- Mentorship Requests -->
         <div class="glass-card-flat p-4 mb-4 animate-rise-2">
-          <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:1rem">
-            Mentorship Requests
-            {% if pending_requests.count > 0 %}
-            <span class="notif-badge" style="vertical-align:middle">{{ pending_requests.count }}</span>
-            {% endif %}
-          </h3>
+          <h3 style="font-family:'Instrument Serif',serif;font-size:1.3rem;margin-bottom:1.25rem">Mentorship Requests</h3>
           {% if pending_requests %}
-          {% for req in pending_requests %}
-          <div class="request-card mb-3">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-              <div class="d-flex align-items-center gap-3">
-                <div class="user-avatar">
-                  {% if req.alumni.avatar %}
-                  <img src="{{ req.alumni.avatar.url }}" alt="">
-                  {% else %}
-                  {{ req.alumni.display_name|first|upper }}
-                  {% endif %}
+            {% for req in pending_requests %}
+            <div class="p-3 mb-3" style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);border:1px solid var(--glass-border)">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="user-avatar" style="width:40px;height:40px">
+                    {% if req.student.avatar %}
+                      <img src="{{ req.student.avatar.url }}" alt="">
+                    {% else %}
+                      {{ req.student.display_name|first|upper }}
+                    {% endif %}
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:0.9rem">{{ req.student.display_name }}</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted)">{{ req.student.student_profile.branch }} · Year {{ req.student.student_profile.year }}</div>
+                  </div>
                 </div>
-                <div class="user-name">{{ req.student.display_name }}</div>
-                {% if req.student.student_profile %}
-                <div class="user-meta">{{ req.student.student_profile.branch }} · Year {{
-                  req.student.student_profile.year }}</div>
-                {% endif %}
-                <div style="margin-top:.5rem;font-size:.8rem;color:var(--text-muted);line-height:1.5">
-                  <strong style="color:var(--text-primary)">Message:</strong> {{ req.message|truncatechars:100 }}
-                </div>
-              </div>
-            </div>
-            <div class="d-flex gap-2 flex-wrap">
-              <a href="{% url 'handle_mentorship_request' req.id 'accept' %}" class="btn-success-glass">
-                <i class="bi bi-check-lg"></i> Accept
-              </a>
-              <a href="{% url 'handle_mentorship_request' req.id 'reject' %}" class="btn-danger-glass">
-                <i class="bi bi-x-lg"></i> Decline
-              </a>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div class="empty-state" style="padding:2rem">
-          <div class="empty-state-icon">📬</div>
-          <div class="empty-state-title">No Pending Requests</div>
-          <div class="empty-state-text">When students send you mentorship requests, they'll appear here.</div>
-        </div>
-        {% endif %}
-      </div>
-
-      <!-- Active Mentees -->
-      {% if accepted_students %}
-      <div class="glass-card-flat p-4 mb-4 animate-rise-3">
-        <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:1rem">Active Mentees</h3>
-        <div class="row g-3">
-          {% for req in accepted_students %}
-          <div class="col-sm-6">
-            <div class="user-card">
-              <div class="d-flex align-items-center gap-3">
-                <div class="user-avatar">{{ req.student.display_name|first|upper }}</div>
-                <div>
-                  <div class="user-name">{{ req.student.display_name }}</div>
-                  {% if req.student.student_profile %}
-                  <div class="user-meta">{{ req.student.student_profile.branch }} · Y{{ req.student.student_profile.year
-                    }}</div>
-                  {% endif %}
+                <div class="d-flex gap-2">
+                  <a href="{% url 'handle_mentorship_request' req.id 'accept' %}" class="btn-success-glass btn-sm">Accept</a>
+                  <a href="{% url 'handle_mentorship_request' req.id 'reject' %}" class="btn-danger-glass btn-sm">Decline</a>
                 </div>
               </div>
-              <div class="d-flex gap-2">
-                <a href="{% url 'chat' req.student.id %}" class="btn-success-glass">
-                  <i class="bi bi-chat-dots"></i> Chat
-                </a>
-                <a href="{% url 'view_profile' req.student.id %}" class="btn-ghost-glass"
-                  style="font-size:.8rem;padding:.4rem .9rem">Profile</a>
-              </div>
+              {% if req.message %}
+                <div class="mt-2 p-2 small italic text-muted" style="background:rgba(0,0,0,0.1);border-radius:var(--radius-sm)">
+                  "{{ req.message|truncatechars:150 }}"
+                </div>
+              {% endif %}
             </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-
-      <!-- My Posts -->
-      <div class="glass-card-flat p-4 animate-rise-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin:0">My Posts</h3>
-          <a href="{% url 'create_post' %}" style="font-size:.8rem;color:var(--gold)">+ New Post</a>
-        </div>
-        {% if my_posts %}
-        {% for post in my_posts %}
-        <div class="post-card mb-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="post-title">{{ post.title }}</div>
-              <div class="post-meta">
-                <span class="badge-glass badge-{{ post.post_type }}">{{ post.get_post_type_display }}</span>
-                {% if post.company %}· {{ post.company }}{% endif %}
-                {% if post.deadline %}· <i class="bi bi-calendar3"></i> {{ post.deadline }}{% endif %}
-              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-4">
+              <div style="font-size:1.5rem;opacity:0.3">📭</div>
+              <p class="text-muted small mt-2">No pending requests at the moment.</p>
             </div>
-            <a href="{% url 'delete_post' post.id %}" class="btn-danger-glass"
-              style="font-size:.75rem;padding:.3rem .7rem" data-confirm="Delete this post?">
-              <i class="bi bi-trash"></i>
-            </a>
-          </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div class="empty-state" style="padding:2rem">
-          <div class="empty-state-icon">📋</div>
-          <div class="empty-state-title">No Posts Yet</div>
-          <div class="empty-state-text">Share job opportunities and internships with students.</div>
-          <a href="{% url 'create_post' %}" class="btn-primary-glass">Create First Post</a>
-        </div>
-        {% endif %}
-      </div>
-
-    </div>
-
-    <!-- Sidebar -->
-    <div class="col-lg-4">
-      <div class="glass-card-flat p-4 mb-4 animate-rise-2">
-        <div class="text-center mb-3">
-          <div class="user-avatar" style="width:64px;height:64px;font-size:1.5rem;margin:0 auto">{{
-            user.display_name|first|upper }}</div>
-          <div style="margin-top:.75rem;font-weight:600;color:var(--text-primary)">{{ user.display_name }}</div>
-          {% if user.alumni_profile %}
-          <div style="font-size:.85rem;color:var(--gold);font-weight:500">{{ user.alumni_profile.company }}</div>
-          <div style="font-size:.8rem;color:var(--text-muted)">{{ user.alumni_profile.role }}</div>
-          <div style="font-size:.75rem;color:var(--text-dim);margin-top:.25rem">{{ user.alumni_profile.experience_years
-            }} years experience</div>
           {% endif %}
         </div>
-        {% if user.alumni_profile and user.alumni_profile.skills %}
-        <div style="margin-top:.75rem;text-align:center">
-          {% for skill in user.alumni_profile.skills_list %}
-          <span class="skill-tag">{{ skill }}</span>
-          {% endfor %}
+
+        <!-- Mentees List -->
+        {% if accepted_students %}
+        <div class="glass-card-flat p-4 animate-rise-3">
+          <h3 style="font-family:'Instrument Serif',serif;font-size:1.3rem;margin-bottom:1.25rem">Active Mentees</h3>
+          <div class="row g-3">
+            {% for req in accepted_students %}
+            <div class="col-sm-6">
+              <div class="user-card">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                   <div class="user-avatar" style="width:40px;height:40px">
+                    {% if req.student.avatar %}
+                      <img src="{{ req.student.avatar.url }}" alt="">
+                    {% else %}
+                      {{ req.student.display_name|first|upper }}
+                    {% endif %}
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:0.9rem">{{ req.student.display_name }}</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted)">{{ req.student.student_profile.branch }}</div>
+                  </div>
+                </div>
+                <a href="{% url 'chat' req.student.id %}" class="btn-ghost-glass w-100 justify-content-center" style="font-size:0.8rem">
+                  <i class="bi bi-chat-dots"></i> Message
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
         {% endif %}
-        {% if user.linkedin %}
-        <a href="{{ user.linkedin }}" target="_blank" class="btn-ghost-glass w-100 justify-content-center mt-3"
-          style="font-size:.85rem">
-          <i class="bi bi-linkedin"></i> LinkedIn
-        </a>
-        {% endif %}
-        <a href="{% url 'edit_profile' %}" class="btn-ghost-glass w-100 justify-content-center mt-2"
-          style="font-size:.85rem">
-          <i class="bi bi-pencil"></i> Edit Profile
-        </a>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Profile Overview -->
+        <div class="glass-card-flat p-4 mb-4 animate-rise-2 text-center">
+          <div class="user-avatar mx-auto mb-3" style="width:72px;height:72px;font-size:1.5rem">
+            {% if user.avatar %}
+              <img src="{{ user.avatar.url }}" alt="">
+            {% else %}
+              {{ user.display_name|first|upper }}
+            {% endif %}
+          </div>
+          <h4 style="font-family:'Instrument Serif',serif;margin:0">{{ user.display_name }}</h4>
+          <p class="text-muted small mb-2">{{ user.alumni_profile.role }} at {{ user.alumni_profile.company }}</p>
+          <div class="mb-3">
+            {% for skill in user.alumni_profile.skills_list|slice:":3" %}
+              <span class="badge-glass" style="font-size:0.65rem">{{ skill }}</span>
+            {% endfor %}
+          </div>
+          <a href="{% url 'profile' %}" class="btn-ghost-glass w-100 justify-content-center" style="font-size:0.8rem">Manage Profile</a>
+        </div>
+
+        <!-- Recent Posts Management -->
+        <div class="glass-card-flat p-4 animate-rise-3">
+          <h5 style="font-size:0.9rem;font-weight:600;margin-bottom:1rem">Recent Contributions</h5>
+          {% for post in my_posts|slice:":3" %}
+          <div class="mb-2 p-2" style="background:rgba(0,0,0,0.1);border-radius:var(--radius-sm)">
+            <div style="font-size:0.8rem;color:var(--text-primary);font-weight:500">{{ post.title|truncatechars:30 }}</div>
+            <div class="d-flex justify-content-between align-items-center mt-1">
+              <span style="font-size:0.7rem;color:var(--text-dim)">{{ post.created_at|date:"M d" }}</span>
+              <a href="{% url 'delete_post' post.id %}" class="text-danger" style="font-size:0.75rem" data-confirm="Delete this post?">Delete</a>
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-muted small">You haven't posted anything yet.</p>
+          {% endfor %}
+        </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 {% endblock %}

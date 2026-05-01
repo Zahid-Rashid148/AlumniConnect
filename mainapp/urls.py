@@ -40,6 +40,7 @@ urlpatterns = [
     # Profile
     path('profile/', views.profile, name='profile'),
     path('profile/<int:user_id>/', views.profile, name='view_profile'),
+    path('profile/modal/<int:user_id>/', views.profile_modal, name='profile_modal'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
 
     # Notifications

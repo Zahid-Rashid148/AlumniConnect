@@ -158,4 +158,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── Password Visibility Toggle ────────────────────────────
+  window.togglePassword = function(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (input) {
+      if (input.type === 'password') {
+        input.type = 'text';
+        iconElement.classList.replace('bi-eye', 'bi-eye-slash');
+      } else {
+        input.type = 'password';
+        iconElement.classList.replace('bi-eye-slash', 'bi-eye');
+      }
+    }
+  };
+
 });

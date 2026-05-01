@@ -7,19 +7,45 @@
 
     <!-- Header -->
     <div class="dashboard-header animate-rise">
-      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-          <div class="section-eyebrow">Admin Control Panel</div>
+          <div class="section-eyebrow">Platform Control</div>
           <h1 class="dashboard-greeting">System Overview <span style="color:var(--danger)">⬡</span></h1>
-          <p class="dashboard-subtitle">Manage users, verify registrations, and monitor platform activity.</p>
+          <p class="dashboard-subtitle">Monitor registrations, manage permissions, and maintain platform health.</p>
         </div>
-        <a href="/admin/" class="btn-primary-glass" style="background:linear-gradient(135deg,var(--danger),#cc003c)">
-          <i class="bi bi-gear-fill"></i> Django Admin
-        </a>
+        <div class="d-flex gap-2">
+          <a href="/admin/" class="btn-primary-glass" style="background:var(--danger);color:#fff">
+            <i class="bi bi-gear-fill"></i> Core Admin
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- Stats -->
+    <!-- Quick Action Hub -->
+    <div class="action-grid animate-rise-1">
+      <a href="#approvals" class="action-item">
+        <i class="bi bi-person-check"></i>
+        <span>Review Users</span>
+      </a>
+      <a href="#mentorships" class="action-item">
+        <i class="bi bi-link-45deg"></i>
+        <span>Connections</span>
+      </a>
+      <a href="/admin/mainapp/post/" class="action-item">
+        <i class="bi bi-clipboard-data"></i>
+        <span>Audit Posts</span>
+      </a>
+      <a href="/admin/mainapp/message/" class="action-item">
+        <i class="bi bi-shield-shaded"></i>
+        <span>Moderation</span>
+      </a>
+      <a href="/admin/auth/user/" class="action-item">
+        <i class="bi bi-people"></i>
+        <span>User DB</span>
+      </a>
+    </div>
+
+    <!-- Stats Row -->
     <div class="row g-3 mb-5 animate-rise-1">
       <div class="col-6 col-lg">
         <div class="stat-card">
@@ -46,7 +72,7 @@
         <div class="stat-card">
           <span class="stat-icon" style="color:var(--success)">🤝</span>
           <div class="stat-value" style="color:var(--success)">{{ stats.mentorships }}</div>
-          <div class="stat-label">Active Mentorships</div>
+          <div class="stat-label">Active Pairs</div>
         </div>
       </div>
       <div class="col-6 col-lg">
@@ -58,64 +84,45 @@
       </div>
     </div>
 
-    <!-- Pending Approvals -->
-    <div class="glass-card-flat p-4 mb-4 animate-rise-2">
-      <h3 style="font-family:'Instrument Serif',serif;font-size:1.3rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem">
-        Pending Approvals
+    <!-- Approvals Section -->
+    <div id="approvals" class="glass-card-flat p-4 mb-4 animate-rise-2">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 style="font-family:'Instrument Serif',serif;font-size:1.4rem;margin:0">Pending Approvals</h3>
         {% if stats.pending > 0 %}
-          <span class="notif-badge" style="background:var(--gold);color:#1a0e00">{{ stats.pending }}</span>
+          <span class="badge rounded-pill bg-danger">{{ stats.pending }} New</span>
         {% endif %}
-      </h3>
+      </div>
       {% if pending_users %}
         <div style="overflow-x:auto">
           <table class="table-glass">
             <thead>
               <tr>
-                <th>User</th>
+                <th>Identity</th>
                 <th>Role</th>
-                <th>Details</th>
-                <th>Registered</th>
-                <th>Actions</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {% for u in pending_users %}
               <tr>
                 <td>
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="user-avatar" style="width:32px;height:32px;font-size:.85rem;flex-shrink:0">{{ u.display_name|first|upper }}</div>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="user-avatar" style="width:32px;height:32px;font-size:0.8rem">
+                      {{ u.display_name|first|upper }}
+                    </div>
                     <div>
-                      <div style="font-weight:600;font-size:.875rem">{{ u.display_name }}</div>
-                      <div style="font-size:.75rem;color:var(--text-muted)">{{ u.email }}</div>
+                      <div style="font-size:0.9rem;font-weight:600">{{ u.display_name }}</div>
+                      <div style="font-size:0.75rem;color:var(--text-muted)">{{ u.email }}</div>
                     </div>
                   </div>
                 </td>
-                <td>
-                  <span class="badge-glass {% if u.role == 'student' %}badge-job{% else %}badge-internship{% endif %}">
-                    {{ u.get_role_display }}
-                  </span>
-                </td>
-                <td style="font-size:.8rem;color:var(--text-muted)">
-                  {% if u.role == 'student' and u.student_profile %}
-                    {{ u.student_profile.branch }} · Y{{ u.student_profile.year }}
-                  {% elif u.role == 'alumni' and u.alumni_profile %}
-                    {{ u.alumni_profile.company }} · {{ u.alumni_profile.role }}
-                  {% else %}
-                    —
-                  {% endif %}
-                </td>
-                <td style="font-size:.8rem;color:var(--text-muted)">{{ u.created_at|date:"M d, Y" }}</td>
+                <td><span class="badge-glass">{{ u.get_role_display }}</span></td>
+                <td><span class="badge-glass badge-pending">Waiting</span></td>
                 <td>
                   <div class="d-flex gap-2">
-                    <a href="{% url 'approve_user' u.id %}" class="btn-success-glass" style="font-size:.78rem;padding:.35rem .8rem">
-                      <i class="bi bi-check-lg"></i> Approve
-                    </a>
-                    <a href="{% url 'reject_user' u.id %}"
-                       class="btn-danger-glass"
-                       style="font-size:.78rem;padding:.35rem .8rem"
-                       data-confirm="Reject {{ u.display_name }}?">
-                      <i class="bi bi-x-lg"></i> Reject
-                    </a>
+                    <a href="{% url 'approve_user' u.id %}" class="btn-success-glass btn-sm">Approve</a>
+                    <a href="{% url 'reject_user' u.id %}" class="btn-danger-glass btn-sm">Reject</a>
                   </div>
                 </td>
               </tr>
@@ -124,104 +131,32 @@
           </table>
         </div>
       {% else %}
-        <div class="empty-state" style="padding:2rem">
-          <div class="empty-state-icon">✅</div>
-          <div class="empty-state-title">All Clear!</div>
-          <div class="empty-state-text">No pending registrations at this time.</div>
+        <div class="text-center py-5 opacity-50">
+          <i class="bi bi-check-all" style="font-size:3rem"></i>
+          <p>No pending approvals. System is up to date.</p>
         </div>
       {% endif %}
     </div>
 
-    <div class="row g-4">
-
-      <!-- All Students -->
-      <div class="col-lg-6">
-        <div class="glass-card-flat p-4 animate-rise-3">
-          <h3 style="font-family:'Instrument Serif',serif;font-size:1.1rem;margin-bottom:1rem">
-            All Students <span style="font-size:.75rem;color:var(--text-muted);font-family:'Inter',sans-serif">({{ all_students.count }})</span>
-          </h3>
-          <div style="max-height:320px;overflow-y:auto">
-            {% for u in all_students %}
-            <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom:1px solid rgba(255,255,255,0.04)">
-              <div class="d-flex align-items-center gap-2">
-                <div class="user-avatar" style="width:30px;height:30px;font-size:.8rem;flex-shrink:0">{{ u.display_name|first|upper }}</div>
-                <div>
-                  <div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">{{ u.display_name }}</div>
-                  {% if u.student_profile %}
-                  <div style="font-size:.72rem;color:var(--text-muted)">{{ u.student_profile.branch }}</div>
-                  {% endif %}
-                </div>
-              </div>
-              <span class="badge-glass badge-{{ u.status }}">{{ u.get_status_display }}</span>
+    <!-- Mentorships Hub -->
+    <div id="mentorships" class="glass-card-flat p-4 animate-rise-3">
+      <h3 style="font-family:'Instrument Serif',serif;font-size:1.4rem;margin-bottom:1.5rem">Recent Mentorship Pairings</h3>
+      <div class="row g-3">
+        {% for m in all_mentorships|slice:":6" %}
+        <div class="col-md-4">
+          <div class="p-3" style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);border:1px solid var(--glass-border)">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+              <span class="small fw-bold">{{ m.student.display_name|truncatechars:10 }}</span>
+              <i class="bi bi-arrow-right-short text-muted"></i>
+              <span class="small fw-bold">{{ m.alumni.display_name|truncatechars:10 }}</span>
             </div>
-            {% empty %}
-            <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:.85rem">No students registered yet.</div>
-            {% endfor %}
+            <div class="text-center">
+               <span class="badge-glass badge-{{ m.status }}" style="font-size:0.6rem">{{ m.get_status_display }}</span>
+            </div>
           </div>
         </div>
+        {% endfor %}
       </div>
-
-      <!-- All Alumni -->
-      <div class="col-lg-6">
-        <div class="glass-card-flat p-4 animate-rise-3">
-          <h3 style="font-family:'Instrument Serif',serif;font-size:1.1rem;margin-bottom:1rem">
-            All Alumni <span style="font-size:.75rem;color:var(--text-muted);font-family:'Inter',sans-serif">({{ all_alumni.count }})</span>
-          </h3>
-          <div style="max-height:320px;overflow-y:auto">
-            {% for u in all_alumni %}
-            <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom:1px solid rgba(255,255,255,0.04)">
-              <div class="d-flex align-items-center gap-2">
-                <div class="user-avatar" style="width:30px;height:30px;font-size:.8rem;flex-shrink:0;background:linear-gradient(135deg,var(--gold),#c8910a)">{{ u.display_name|first|upper }}</div>
-                <div>
-                  <div style="font-size:.85rem;font-weight:600;color:var(--text-primary)">{{ u.display_name }}</div>
-                  {% if u.alumni_profile %}
-                  <div style="font-size:.72rem;color:var(--text-muted)">{{ u.alumni_profile.company }}</div>
-                  {% endif %}
-                </div>
-              </div>
-              <span class="badge-glass badge-{{ u.status }}">{{ u.get_status_display }}</span>
-            </div>
-            {% empty %}
-            <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:.85rem">No alumni registered yet.</div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- All Mentorships -->
-    <div class="glass-card-flat p-4 mt-4 animate-rise-4">
-      <h3 style="font-family:'Instrument Serif',serif;font-size:1.1rem;margin-bottom:1rem">All Mentorship Connections</h3>
-      {% if all_mentorships %}
-        <div style="overflow-x:auto">
-          <table class="table-glass">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Alumni</th>
-                <th>Status</th>
-                <th>Requested</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for m in all_mentorships %}
-              <tr>
-                <td style="font-size:.875rem">{{ m.student.display_name }}</td>
-                <td style="font-size:.875rem">{{ m.alumni.display_name }}</td>
-                <td><span class="badge-glass badge-{{ m.status }}">{{ m.get_status_display }}</span></td>
-                <td style="font-size:.8rem;color:var(--text-muted)">{{ m.created_at|date:"M d, Y" }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="empty-state" style="padding:2rem">
-          <div class="empty-state-icon">🔗</div>
-          <div class="empty-state-title">No Mentorship Connections Yet</div>
-        </div>
-      {% endif %}
     </div>
 
   </div>

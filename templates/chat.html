@@ -18,7 +18,13 @@
         <!-- Other user info -->
         <div style="padding:1.25rem;border-bottom:1px solid var(--glass-border)">
           <div class="d-flex align-items-center gap-3">
-            <div class="user-avatar" style="width:44px;height:44px;font-size:1.1rem">{{ other_user.display_name|first|upper }}</div>
+            <div class="user-avatar" style="width:44px;height:44px;font-size:1.1rem">
+              {% if other_user.avatar %}
+              <img src="{{ other_user.avatar.url }}" alt="">
+              {% else %}
+              {{ other_user.display_name|first|upper }}
+              {% endif %}
+            </div>
             <div>
               <div style="font-weight:600;font-size:.9rem;color:var(--text-primary)">{{ other_user.display_name }}</div>
               <div style="font-size:.75rem;color:var(--text-muted)">{{ other_user.get_role_display }}</div>
@@ -31,7 +37,7 @@
 
         <!-- Profile link -->
         <div style="padding:1rem">
-          <a href="{% url 'view_profile' other_user.id %}" class="btn-ghost-glass w-100 justify-content-center" style="font-size:.8rem">
+          <a href="javascript:void(0)" onclick="openProfileModal('{{ other_user.id }}')" class="btn-ghost-glass w-100 justify-content-center" style="font-size:.8rem">
             <i class="bi bi-person"></i> View Profile
           </a>
           {% if other_user.linkedin %}
@@ -47,7 +53,13 @@
 
         <!-- Chat Header -->
         <div class="chat-header">
-          <div class="user-avatar" style="width:36px;height:36px;font-size:.9rem">{{ other_user.display_name|first|upper }}</div>
+          <div class="user-avatar" style="width:36px;height:36px;font-size:.9rem">
+            {% if other_user.avatar %}
+            <img src="{{ other_user.avatar.url }}" alt="">
+            {% else %}
+            {{ other_user.display_name|first|upper }}
+            {% endif %}
+          </div>
           <div>
             <div style="font-weight:600;font-size:.9rem;color:var(--text-primary)">{{ other_user.display_name }}</div>
             <div style="font-size:.72rem;color:var(--success)">● Active Mentorship</div>

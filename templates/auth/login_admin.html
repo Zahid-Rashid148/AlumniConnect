@@ -3,8 +3,6 @@
 
 {% block content %}
 <div class="auth-page">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,77,109,0.04) 0%,transparent 60%)"></div>
-
   <div class="auth-card">
     <div class="auth-logo">AlumniConnect®</div>
     <div class="auth-role-badge" style="background:rgba(255,77,109,0.08);color:var(--danger);border-color:rgba(255,77,109,0.2)">
@@ -20,10 +18,13 @@
         <input type="text" name="username" class="form-control-glass" placeholder="admin_username" required>
       </div>
       <div class="form-group-glass">
-        <label class="form-label-glass">Admin Password</label>
-        <input type="password" name="password" class="form-control-glass" placeholder="••••••••" required>
+        <label class="form-label-glass">Password</label>
+        <div class="position-relative">
+          <input type="password" name="password" id="admin_password" class="form-control-glass pe-5" placeholder="••••••••" required>
+          <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePassword('admin_password', this)" style="cursor: pointer; z-index: 10;"></i>
+        </div>
       </div>
-      <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2" style="background:linear-gradient(135deg,var(--danger),#cc003c)">
+      <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2">
         <i class="bi bi-shield-check"></i> Access Admin Panel
       </button>
     </form>
