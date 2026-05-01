@@ -97,9 +97,10 @@ The platform features distinct login portals to maintain security and tailored u
 | **Admin** | `/login/admin/` | Platform oversight, user verification, analytics. |
 
 **Sample Credentials (from seed data):**
-- **Admin**: `admin` / `admin123`
-- **Alumni**: `priya_sharma` / `password123`
-- **Student**: `aarav_singh` / `password123`
+- **Admin**: `Admin` / `Admin@123`
+- **Alumni**: `alumni` / `Test@123`
+- **Student**: `student1` / `Test@123`
+- **Student**: `student2` / `basit123`
 
 ---
 
