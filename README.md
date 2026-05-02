@@ -27,6 +27,49 @@ AlumniConnect® is a high-fidelity, production-grade web application designed fo
 
 ---
 
+## 🏗️ Project Architecture
+
+AlumniConnect is built on a robust, decoupled architecture designed for scalability, performance, and institutional security.
+
+### 📡 System Overview
+```mermaid
+graph TD
+    User((User)) -->|HTTPS| WebServer[WSGI Server / Gunicorn]
+    WebServer -->|Requests| DjangoApp[Django Core Engine]
+    DjangoApp -->|Logic| AuthModule[Role-Based Auth]
+    DjangoApp -->|Data| Database[(PostgreSQL / SQLite)]
+    DjangoApp -->|Rendering| Templates[Django Template Engine]
+    DjangoApp -->|Assets| StaticFiles[Static Assets: JS/CSS/Canvas]
+    
+    subgraph "Frontend Layer (Cinematic UI)"
+        Templates --> GlassUI[Glassmorphic UI]
+        StaticFiles --> FireEngine[Canvas Particle Engine]
+        StaticFiles --> PageTransitions[Cinematic Transitions]
+    end
+```
+
+### 🗄️ Database Schema & Relationships
+The platform utilizes a relational database structure with a **Custom User Model** at its core to support multi-role authentication.
+
+*   **User Model**: Core identity with `is_student`, `is_alumni`, and `is_admin` flags.
+*   **Profiles**: One-to-One relationships extending the User model with role-specific metadata (Bio, Skills, Graduation Year).
+*   **Mentorship Requests**: Handles the state management (Pending/Accepted/Rejected) between Students and Alumni.
+*   **Messaging Engine**: Secure storage of 1:1 communications, filtered by approved mentorship status.
+*   **Opportunity Board**: Multi-type posting system (Jobs/Internships/Events) with alumni authorship.
+
+### 🛡️ Role-Based Access Control (RBAC)
+Authentication and Authorization are enforced at the view level using Django decorators and mixins:
+-   **Student Access**: Restricted to browsing alumni and managing their own mentorship requests.
+-   **Alumni Access**: Authorized to manage mentee pools, post to the Opportunity Board, and access analytics.
+-   **Admin Access**: Full platform oversight including user verification and site-wide monitoring via the Jazzmin-enhanced control center.
+
+### 🎨 Frontend Pipeline
+-   **Design System**: Custom CSS variables for theme tokens (Noir aesthetic).
+-   **Rendering**: Server-Side Rendering (SSR) for SEO and initial load speed, augmented by AJAX for seamless profile views.
+-   **Animations**: Hardware-accelerated CSS3 transforms and `requestAnimationFrame` for the Canvas particle engine.
+
+---
+
 ## 🛠 Tech Stack
 
 | Category | Technology |
@@ -79,12 +122,22 @@ Visit `http://127.0.0.1:8000` to experience the cinematic entrance.
 
 ---
 
-## 📁 Architecture Highlights
+## 📁 Directory Structure
 
-- **`static/css/main.css`**: The core design system including the Glassmorphism layers.
-- **`static/js/main.js`**: Orchestrates the Particle Engine and AJAX animations.
-- **`mainapp/`**: Contains the custom User model and the core mentorship logic.
-- **`templates/base.html`**: The cinematic foundation containing the background canvas and session-aware preloader.
+```text
+alumniconnect/
+├── alumniconnect/          # Core Configuration (settings, urls, wsgi)
+├── mainapp/                # Business Logic & Models
+│   ├── models.py           # Database Schemas (User, Profiles, Messages)
+│   ├── views.py            # Route Handlers & RBAC Logic
+│   ├── forms.py            # Validated Input Handlers
+│   └── urls.py             # App-level Routing
+├── static/                 # Frontend Assets
+│   ├── css/main.css        # Glassmorphic Design System
+│   └── js/main.js          # Canvas Fire Engine & Logic
+├── templates/              # Cinematic UI Layouts
+└── media/                  # User-uploaded Content
+```
 
 ---
 
