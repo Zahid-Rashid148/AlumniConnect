@@ -7,10 +7,10 @@
    ═══════════════════════════════════════════════════════════ */
 const themeManager = {
   init() {
-    const savedTheme = localStorage.getItem('theme') || 
-                      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    const savedTheme = localStorage.getItem('theme') ||
+      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
     this.applyTheme(savedTheme, false);
-    
+
     // Listen for system changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
       if (!localStorage.getItem('theme')) {
