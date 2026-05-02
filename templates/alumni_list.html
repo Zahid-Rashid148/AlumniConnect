@@ -7,15 +7,15 @@
     <div class="dashboard-header animate-rise">
       <div class="section-eyebrow">Alumni Directory</div>
       {% if request.user.role == 'student' %}
-        <h1 class="dashboard-greeting">Find Your Mentor</h1>
-        <p class="dashboard-subtitle">
-          Connect with experienced alumni who've walked the path before you.
-        </p>
+      <h1 class="dashboard-greeting">Find Your Mentor</h1>
+      <p class="dashboard-subtitle">
+        Connect with experienced alumni who've walked the path before you.
+      </p>
       {% else %}
-        <h1 class="dashboard-greeting">Alumni Network</h1>
-        <p class="dashboard-subtitle">
-          Connect, collaborate, and network with your fellow alumni.
-        </p>
+      <h1 class="dashboard-greeting">Alumni Network</h1>
+      <p class="dashboard-subtitle">
+        Connect, collaborate, and network with your fellow alumni.
+      </p>
       {% endif %}
     </div>
 
@@ -68,7 +68,8 @@
               flex-wrap: wrap;
               gap: 8px;
             ">
-            <span><i class="bi bi-mortarboard"></i> {{ alum.alumni_profile.branch }} · {{ alum.alumni_profile.graduation_year }}</span>
+            <span><i class="bi bi-mortarboard"></i> {{ alum.alumni_profile.branch }} · {{
+              alum.alumni_profile.graduation_year }}</span>
             <span><i class="bi bi-briefcase"></i> {{ alum.alumni_profile.experience_years }} yrs exp</span>
             {% if alum.alumni_profile.domain %}
             <span><i class="bi bi-tag"></i> {{ alum.alumni_profile.domain }}</span>

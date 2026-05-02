@@ -1,0 +1,80 @@
+/* Text Hover Icon Effects — Premium Button Transitions */
+
+.btn-hover-icon {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Icon Style */
+.btn-hover-icon i {
+  display: inline-block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Variant: Slide In From Top ─────────────────────────── */
+.btn-hover-icon-top .btn-icon-hidden {
+  position: absolute;
+  top: -20px;
+  opacity: 0;
+}
+
+.btn-hover-icon-top:hover .btn-icon-hidden {
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+}
+
+.btn-hover-icon-top:hover .btn-text-main {
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+/* ── Variant: Slide In From Right ───────────────────────── */
+.btn-hover-icon-right .btn-icon-hidden {
+  position: absolute;
+  right: -20px;
+  opacity: 0;
+}
+
+.btn-hover-icon-right:hover .btn-icon-hidden {
+  right: 15px;
+  opacity: 1;
+}
+
+.btn-hover-icon-right:hover .btn-text-main {
+  transform: translateX(-15px);
+}
+
+/* ── Variant: Fade In/Out ──────────────────────────────── */
+.btn-hover-fade .btn-icon-hidden {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.btn-hover-fade:hover .btn-icon-hidden {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.btn-hover-fade:hover .btn-text-main {
+  opacity: 0;
+  transform: scale(1.1);
+}
+
+/* ── Specific integration for glass buttons ─────────────── */
+.btn-primary-glass.btn-hover-icon,
+.btn-ghost-glass.btn-hover-icon,
+.glowing-beam-btn.btn-hover-icon {
+  /* Ensure parent is relative for absolute icons */
+}
+
+.btn-text-main {
+  display: inline-block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

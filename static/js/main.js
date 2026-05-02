@@ -2,16 +2,133 @@
 // AlumniConnect® — Main JS
 // ═══════════════════════════════════════════════════════════
 
+/* ═══════════════════════════════════════════════════════════
+   THEME MANAGEMENT SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+const themeManager = {
+  init() {
+    const savedTheme = localStorage.getItem('theme') || 
+                      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    this.applyTheme(savedTheme, false);
+    
+    // Listen for system changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('theme')) {
+        this.applyTheme(e.matches ? 'dark' : 'light', true);
+      }
+    });
+  },
+
+  applyTheme(theme, animate) {
+    if (animate) {
+      document.body.classList.add('theme-transition-active');
+      setTimeout(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.classList.remove('theme-transition-active');
+      }, 300);
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    localStorage.setItem('theme', theme);
+  },
+
+  toggle() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    this.applyTheme(newTheme, true);
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   FIRE & SPARK ENGINE (CANVAS)
+   ═══════════════════════════════════════════════════════════ */
+const fireEngine = {
+  canvas: null,
+  ctx: null,
+  particles: [],
+  maxParticles: 120,
+
+  init() {
+    this.canvas = document.getElementById('fire-canvas');
+    if (!this.canvas) return;
+    this.ctx = this.canvas.getContext('2d');
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.animate();
+  },
+
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  },
+
+  createParticle() {
+    return {
+      x: Math.random() * this.canvas.width,
+      y: this.canvas.height + 10,
+      size: Math.random() * 2 + 1,
+      speedY: Math.random() * -1.5 - 0.5,
+      speedX: Math.random() * 2 - 1,
+      opacity: Math.random() * 0.5 + 0.5,
+      color: Math.random() > 0.5 ? '#f0b429' : '#ffffff'
+    };
+  },
+
+  animate() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    if (this.particles.length < this.maxParticles) {
+      this.particles.push(this.createParticle());
+    }
+
+    for (let i = 0; i < this.particles.length; i++) {
+      let p = this.particles[i];
+      p.y += p.speedY;
+      p.x += p.speedX;
+      p.opacity -= 0.003;
+
+      if (p.opacity <= 0 || p.y < -10) {
+        this.particles[i] = this.createParticle();
+      }
+
+      this.ctx.globalAlpha = p.opacity;
+      this.ctx.fillStyle = p.color;
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+
+    requestAnimationFrame(() => this.animate());
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize Theme & Fire
+  themeManager.init();
+  fireEngine.init();
+
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => themeManager.toggle());
+  }
 
   // ── Page Loader ──────────────────────────────────────────
   const loader = document.getElementById('page-loader');
   if (loader) {
-    window.addEventListener('load', () => {
-      setTimeout(() => loader.classList.add('hidden'), 500);
-    });
-    // Fallback
-    setTimeout(() => loader.classList.add('hidden'), 2500);
+    if (sessionStorage.getItem('loaderShown')) {
+      loader.remove();
+    } else {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          sessionStorage.setItem('loaderShown', 'true');
+        }, 2500);
+      });
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        sessionStorage.setItem('loaderShown', 'true');
+      }, 4500);
+    }
   }
 
   // ── Navbar Scroll Effect ─────────────────────────────────
@@ -62,16 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatMessages = document.getElementById('chat-messages');
   if (chatMessages) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Auto-resize textarea
     const textarea = document.querySelector('.message-input');
     if (textarea) {
       textarea.addEventListener('input', () => {
         textarea.style.height = 'auto';
         textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
       });
-
-      // Send on Ctrl+Enter
       textarea.addEventListener('keydown', e => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
           const form = textarea.closest('form');
@@ -103,38 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   counters.forEach(c => counterObserver.observe(c));
 
-  // ── Notification Read ─────────────────────────────────────
-  document.querySelectorAll('[data-mark-read]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-mark-read');
-      fetch(`/notifications/${id}/read/`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': getCookie('csrftoken') }
-      });
-    });
-  });
-
-  // ── Confirm Delete ────────────────────────────────────────
-  document.querySelectorAll('[data-confirm]').forEach(el => {
-    el.addEventListener('click', e => {
-      if (!confirm(el.getAttribute('data-confirm'))) e.preventDefault();
-    });
-  });
-
-  // ── Skills Input Tag UI ───────────────────────────────────
-  const skillsInput = document.querySelector('input[name="skills"]');
-  if (skillsInput) {
-    skillsInput.addEventListener('input', () => {
-      const preview = document.getElementById('skills-preview');
-      if (!preview) return;
-      preview.innerHTML = skillsInput.value
-        .split(',')
-        .filter(s => s.trim())
-        .map(s => `<span class="skill-tag">${s.trim()}</span>`)
-        .join('');
-    });
-  }
-
   // ── CSRF Cookie Helper ────────────────────────────────────
   function getCookie(name) {
     let cookieValue = null;
@@ -150,16 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return cookieValue;
   }
 
-  // ── Mobile nav toggle class ───────────────────────────────
-  const toggler = document.querySelector('.navbar-toggler');
-  if (toggler) {
-    toggler.addEventListener('click', () => {
-      document.querySelector('.navbar-collapse')?.classList.toggle('show');
-    });
-  }
-
   // ── Password Visibility Toggle ────────────────────────────
-  window.togglePassword = function(inputId, iconElement) {
+  window.togglePassword = function (inputId, iconElement) {
     const input = document.getElementById(inputId);
     if (input) {
       if (input.type === 'password') {
@@ -171,5 +244,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   };
-
 });

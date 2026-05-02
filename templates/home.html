@@ -25,8 +25,8 @@
           </h1>
 
           <p class="hero-subtitle">
-            AlumniConnect bridges the gap between experience and ambition. 
-            Students find their mentors. Alumni leave their legacy. 
+            AlumniConnect bridges the gap between experience and ambition.
+            Students find their mentors. Alumni leave their legacy.
             One platform. Infinite possibilities.
           </p>
 
@@ -70,42 +70,49 @@
         <div class="hero-activity-card">
           <div class="activity-header">RECENT ACTIVITY</div>
 
-            <div style="display:flex;flex-direction:column;gap:12px">
-              {% for post in recent_posts %}
-              <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:var(--radius-md);background:rgba(0,0,0,0.2)">
-                <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden">
-                  {% if post.author.avatar %}
-                  <img src="{{ post.author.avatar.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
-                  {% else %}
-                  {{ post.author.display_name|first|upper }}
-                  {% endif %}
-                </div>
-                <div style="min-width:0">
-                  <div style="font-size:0.85rem;color:var(--text-primary);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ post.title }}</div>
-                  <div style="font-size:0.72rem;color:var(--text-muted)">
-                    <span class="badge-glass badge-{{ post.post_type }}">{{ post.post_type|upper }}</span>
-                    · <a href="javascript:void(0)" onclick="openProfileModal('{{ post.author.id }}')" style="color:var(--accent);text-decoration:none">{{ post.author.display_name }}</a>
-                  </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            {% for post in recent_posts %}
+            <div
+              style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:var(--radius-md);background:rgba(0,0,0,0.2)">
+              <div
+                style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden">
+                {% if post.author.avatar %}
+                <img src="{{ post.author.avatar.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+                {% else %}
+                {{ post.author.display_name|first|upper }}
+                {% endif %}
+              </div>
+              <div style="min-width:0">
+                <div
+                  style="font-size:0.85rem;color:var(--text-primary);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                  {{ post.title }}</div>
+                <div style="font-size:0.72rem;color:var(--text-muted)">
+                  <span class="badge-glass badge-{{ post.post_type }}">{{ post.post_type|upper }}</span>
+                  · <a href="javascript:void(0)" onclick="openProfileModal('{{ post.author.id }}')"
+                    style="color:var(--accent);text-decoration:none">{{ post.author.display_name }}</a>
                 </div>
               </div>
-              {% empty %}
-              <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.85rem">
-                <i class="bi bi-lightning-charge" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:0.4"></i>
-                Be the first to post an opportunity!
-              </div>
-              {% endfor %}
             </div>
+            {% empty %}
+            <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.85rem">
+              <i class="bi bi-lightning-charge"
+                style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:0.4"></i>
+              Be the first to post an opportunity!
+            </div>
+            {% endfor %}
+          </div>
 
-            <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--glass-border)">
-              <a href="{% url 'register_student' %}" class="btn-primary-glass w-100 justify-content-center">
-                Get Started Free <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--glass-border)">
+            <a href="{% url 'register_student' %}" class="btn-primary-glass btn-hover-icon btn-hover-fade w-100 justify-content-center">
+              <span class="btn-text-main">Get Started Free <i class="bi bi-arrow-right"></i></span>
+              <i class="bi bi-rocket-takeoff btn-icon-hidden"></i>
+            </a>
           </div>
         </div>
       </div>
-
     </div>
+
+  </div>
   </div>
 </section>
 
@@ -124,27 +131,36 @@
       <div class="col-md-4">
         <div class="glass-card p-4 text-center h-100 animate-rise-{{ forloop.counter }}">
           {% if forloop.counter == 1 %}
-            <div style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
-              <img src="{% static 'images/create_profile.png' %}" alt="Create Profile" style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
-            </div>
+          <div
+            style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
+            <img src="{% static 'images/create_profile.png' %}" alt="Create Profile"
+              style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
+          </div>
           {% elif forloop.counter == 2 %}
-            <div style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
-              <img src="{% static 'images/find_match.png' %}" alt="Find Match" style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
-            </div>
+          <div
+            style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
+            <img src="{% static 'images/find_match.png' %}" alt="Find Match"
+              style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
+          </div>
           {% elif forloop.counter == 3 %}
-            <div style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
-              <img src="{% static 'images/grow_together.png' %}" alt="Grow" style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
-            </div>
+          <div
+            style="width:64px;height:64px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;mix-blend-mode:multiply;border-radius:50%;overflow:hidden;">
+            <img src="{% static 'images/grow_together.png' %}" alt="Grow"
+              style="width:100%;height:100%;object-fit:cover;filter:contrast(100);">
+          </div>
           {% endif %}
           {% if forloop.counter == 1 %}
-            <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:.5rem">Create Your Profile</h3>
-            <p style="font-size:.875rem;color:var(--text-muted);line-height:1.7">Sign up as a student or alumni. Share your expertise, goals, and background. Admin verifies your account for quality assurance.</p>
+          <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:.5rem">Create Your Profile</h3>
+          <p style="font-size:.875rem;color:var(--text-muted);line-height:1.7">Sign up as a student or alumni. Share
+            your expertise, goals, and background. Admin verifies your account for quality assurance.</p>
           {% elif forloop.counter == 2 %}
-            <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:.5rem">Find Your Match</h3>
-            <p style="font-size:.875rem;color:var(--text-muted);line-height:1.7">Browse alumni profiles, filter by domain and skills, and send a personalized mentorship request with your goals.</p>
+          <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:.5rem">Find Your Match</h3>
+          <p style="font-size:.875rem;color:var(--text-muted);line-height:1.7">Browse alumni profiles, filter by domain
+            and skills, and send a personalized mentorship request with your goals.</p>
           {% else %}
-            <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:.5rem">Grow Together</h3>
-            <p style="font-size:.875rem;color:var(--text-muted);line-height:1.7">Once accepted, unlock direct messaging. Explore job postings, internships, and build lasting professional relationships.</p>
+          <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:.5rem">Grow Together</h3>
+          <p style="font-size:.875rem;color:var(--text-muted);line-height:1.7">Once accepted, unlock direct messaging.
+            Explore job postings, internships, and build lasting professional relationships.</p>
           {% endif %}
         </div>
       </div>
@@ -209,7 +225,8 @@
   <div class="container">
     <div style="max-width:600px;margin:0 auto">
       <div class="section-eyebrow" style="justify-content:center;display:flex">Join Today</div>
-      <h2 style="font-family:'Instrument Serif',serif;font-size:clamp(2rem,4vw,3rem);color:var(--text-primary);margin-bottom:1rem">
+      <h2
+        style="font-family:'Instrument Serif',serif;font-size:clamp(2rem,4vw,3rem);color:var(--text-primary);margin-bottom:1rem">
         Your Mentor is Waiting.<br>
         <span style="color:var(--accent)">So is Your Legacy.</span>
       </h2>

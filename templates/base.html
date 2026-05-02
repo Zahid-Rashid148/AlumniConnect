@@ -8,6 +8,9 @@
   <title>{% block title %}AlumniConnect®{% endblock %}</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{% static 'css/glowing_beam.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/luma_btn.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/button_effects.css' %}" />
   <link rel="stylesheet" href="{% static 'css/main.css' %}" />
   {% block extra_head %}{% endblock %}
 </head>
@@ -16,14 +19,32 @@
   <!-- Cinematic Background -->
   <div class="cinematic-bg">
     <img src="{% static 'images/campus_bg.png' %}" alt="Campus Background">
+    <canvas id="fire-canvas"></canvas>
   </div>
 
-  <!-- Page Loader -->
+  <!-- Page Loader (Logo Fill) -->
   <div id="page-loader">
-    <div class="loader-logo">
-      AlumniConnect<span style="font-size: 0.6em; color: var(--text-muted)">®</span>
+    <script>
+      // Prevent loader from showing multiple times in the same session
+      if (sessionStorage.getItem('loaderShown')) {
+        document.getElementById('page-loader').style.display = 'none';
+      }
+    </script>
+    <div class="logo-fill-container">
+      <div class="logo-wrapper">
+        <!-- Base Layer (Grayscale/Dim) -->
+        <img src="{% static 'images/sdm_logo_hd.png' %}" class="loader-logo-img base-img" alt="SDMCET Logo" width="110"
+          height="110">
+        <!-- Fill Layer (Colored/Rising) -->
+        <div class="fill-box">
+          <img src="{% static 'images/sdm_logo_hd.png' %}" class="loader-logo-img fill-img" alt="SDMCET Logo"
+            width="110" height="110">
+        </div>
+      </div>
+      <div class="loader-brand-text">
+        AlumniConnect<span style="color: var(--text-muted)">®</span>
+      </div>
     </div>
-    <div class="loader-bar"></div>
   </div>
 
   <!-- Navbar -->
@@ -31,8 +52,10 @@
     <div class="container">
       <div class="d-flex align-items-center justify-content-between w-100">
         <!-- Brand -->
-        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="navbar-brand-text d-flex align-items-center gap-2">
-          <img src="/static/images/sdm_logo_untouched.png" alt="SDM Logo" style="height: 48px; width: auto; border-radius: 12px; margin-right: 8px;">
+        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}"
+          class="navbar-brand-text d-flex align-items-center gap-2">
+          <img src="{% static 'images/sdm_logo_hd.png' %}" alt="SDM Logo"
+            style="height: 48px; width: auto; border-radius: 12px; margin-right: 8px;">
           <div style="display: flex; align-items: baseline;">
             Alumni<span style="color: #A1A1AA;">Connect</span>®
           </div>
@@ -41,54 +64,71 @@
         <!-- Nav Links -->
         <div class="d-none d-md-flex align-items-center gap-1">
           {% if user.is_authenticated %}
-            <!-- Logged In Links -->
-            <a href="{% url 'dashboard' %}"
-              class="nav-link-glass {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-              <i class="bi bi-grid-fill" style="font-size: 0.9rem; margin-right: 4px;"></i> Dashboard
-            </a>
-            <a href="{% url 'alumni_list' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'alumni_list' %}active{% endif %}">Alumni</a>
-            <a href="{% url 'posts_list' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'posts_list' %}active{% endif %}">Opportunities</a>
-            <a href="{% url 'inbox' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'inbox' or request.resolver_match.url_name == 'chat' %}active{% endif %}">Messages</a>
-            
-            <div class="dropdown ms-2">
-              <button class="btn-ghost-glass dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                {% if user.avatar %}
-                <img src="{{ user.avatar.url }}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);" />
-                {% else %}
-                <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #fff;">{{ user.display_name|first|upper }}</span>
-                {% endif %} {{ user.display_name|truncatechars:12 }}
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-md);">
-                <li><a class="dropdown-item" href="{% url 'profile' %}" style="color: var(--text-muted); font-size: 0.875rem">My Profile</a></li>
-                <li><a class="dropdown-item" href="{% url 'edit_profile' %}" style="color: var(--text-muted); font-size: 0.875rem">Edit Settings</a></li>
-                <li><hr class="dropdown-divider" style="border-color: var(--glass-border)" /></li>
-                <li><a class="dropdown-item" href="{% url 'logout' %}" style="color: var(--danger); font-size: 0.875rem">Sign Out</a></li>
-              </ul>
-            </div>
+          <!-- Logged In Links -->
+          <a href="{% url 'dashboard' %}"
+            class="nav-link-glass {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="bi bi-grid-fill" style="font-size: 0.9rem; margin-right: 4px;"></i> Dashboard
+          </a>
+          <a href="{% url 'alumni_list' %}"
+            class="nav-link-glass {% if request.resolver_match.url_name == 'alumni_list' %}active{% endif %}">Alumni</a>
+          <a href="{% url 'posts_list' %}"
+            class="nav-link-glass {% if request.resolver_match.url_name == 'posts_list' %}active{% endif %}">Opportunities</a>
+          <a href="{% url 'inbox' %}"
+            class="nav-link-glass {% if request.resolver_match.url_name == 'inbox' or request.resolver_match.url_name == 'chat' %}active{% endif %}">Messages</a>
+
+          <div class="dropdown ms-2">
+            <button class="btn-ghost-glass dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              {% if user.avatar %}
+              <img src="{{ user.avatar.url }}"
+                style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);" />
+              {% else %}
+              <span
+                style="width: 26px; height: 26px; border-radius: 50%; background: var(--accent); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #fff;">{{
+                user.display_name|first|upper }}</span>
+              {% endif %} {{ user.display_name|truncatechars:12 }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end"
+              style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-md);">
+              <li><a class="dropdown-item" href="{% url 'profile' %}"
+                  style="color: var(--text-muted); font-size: 0.875rem">My Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'edit_profile' %}"
+                  style="color: var(--text-muted); font-size: 0.875rem">Edit Settings</a></li>
+              <li>
+                <hr class="dropdown-divider" style="border-color: var(--glass-border)" />
+              </li>
+              <li><a class="dropdown-item" href="{% url 'logout' %}"
+                  style="color: var(--danger); font-size: 0.875rem">Sign Out</a></li>
+            </ul>
+          </div>
           {% else %}
-            <!-- Guest Links -->
-            <a href="{% url 'home' %}" class="nav-link-glass {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
-            <a href="{% url 'login_student' %}" class="nav-link-glass">Students</a>
-            <a href="{% url 'login_alumni' %}" class="nav-link-glass">Alumni</a>
-            
-            <div class="dropdown ms-2">
-              <button class="btn-nav-cta dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                Get Started
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                <li><a class="dropdown-item py-2" href="{% url 'register_student' %}" style="color: var(--text-primary); font-size: 0.9rem">
+          <!-- Guest Links -->
+          <a href="{% url 'home' %}"
+            class="nav-link-glass {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+          <a href="{% url 'login_student' %}" class="nav-link-glass">Students</a>
+          <a href="{% url 'login_alumni' %}" class="nav-link-glass">Alumni</a>
+
+          <div class="dropdown ms-2">
+            <button class="btn-nav-cta dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              Get Started
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end"
+              style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+              <li><a class="dropdown-item py-2" href="{% url 'register_student' %}"
+                  style="color: var(--text-primary); font-size: 0.9rem">
                   <i class="bi bi-mortarboard me-2"></i> Student Portal
                 </a></li>
-                <li><a class="dropdown-item py-2" href="{% url 'register_alumni' %}" style="color: var(--text-primary); font-size: 0.9rem">
+              <li><a class="dropdown-item py-2" href="{% url 'register_alumni' %}"
+                  style="color: var(--text-primary); font-size: 0.9rem">
                   <i class="bi bi-briefcase me-2"></i> Alumni Portal
                 </a></li>
-              </ul>
-            </div>
+            </ul>
+          </div>
           {% endif %}
         </div>
 
         <!-- Mobile Toggle -->
-        <button class="navbar-toggler d-md-none" style="background: none; border: 1px solid var(--glass-border); color: var(--text-muted); padding: 6px 10px; border-radius: var(--radius-sm);">
+        <button class="navbar-toggler d-md-none"
+          style="background: none; border: 1px solid var(--glass-border); color: var(--text-muted); padding: 6px 10px; border-radius: var(--radius-sm);">
           <i class="bi bi-list" style="font-size: 1.2rem"></i>
         </button>
       </div>
@@ -115,8 +155,10 @@
   {% if messages %}
   <div class="container mt-3" style="position: relative; z-index: 100">
     {% for message in messages %}
-    <div class="alert-glass {% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %} mb-2">
-      <i class="bi {% if message.tags == 'error' %}bi-x-circle{% elif message.tags == 'warning' %}bi-exclamation-triangle{% elif message.tags == 'success' %}bi-check-circle{% else %}bi-info-circle{% endif %}"></i>
+    <div
+      class="alert-glass {% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %} mb-2">
+      <i
+        class="bi {% if message.tags == 'error' %}bi-x-circle{% elif message.tags == 'warning' %}bi-exclamation-triangle{% elif message.tags == 'success' %}bi-check-circle{% else %}bi-info-circle{% endif %}"></i>
       {{ message }}
     </div>
     {% endfor %}
@@ -129,7 +171,8 @@
   <!-- Profile Modal -->
   <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content" style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+      <div class="modal-content"
+        style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
         <div class="modal-body p-0" id="profileModalBody">
           <div class="p-5 text-center">
             <div class="spinner-border text-primary" role="status">
@@ -147,11 +190,6 @@
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
         <span style="font-family: 'Instrument Serif', serif; color: var(--accent);">AlumniConnect®</span>
         <span>© 2026 · Connecting Futures, Building Legacies</span>
-        <div class="d-flex gap-3">
-          <a href="#" style="color: var(--text-dim)"><i class="bi bi-linkedin"></i></a>
-          <a href="#" style="color: var(--text-dim)"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" style="color: var(--text-dim)"><i class="bi bi-github"></i></a>
-        </div>
       </div>
     </div>
   </footer>
@@ -169,6 +207,9 @@
     }
   </script>
   {% block extra_js %}{% endblock %}
+
+  <!-- Share Overlay Pro Component -->
+  {% include 'includes/share_overlay.html' %}
 </body>
 
 </html>

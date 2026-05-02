@@ -5,7 +5,8 @@
 <div class="auth-page">
   <div class="auth-card">
     <div class="auth-logo">AlumniConnect®</div>
-    <div class="auth-role-badge" style="background:rgba(255,77,109,0.08);color:var(--danger);border-color:rgba(255,77,109,0.2)">
+    <div class="auth-role-badge"
+      style="background:rgba(255,77,109,0.08);color:var(--danger);border-color:rgba(255,77,109,0.2)">
       <i class="bi bi-shield-lock-fill"></i> Admin Portal
     </div>
     <h1 class="auth-title">Admin Access</h1>
@@ -20,12 +21,15 @@
       <div class="form-group-glass">
         <label class="form-label-glass">Password</label>
         <div class="position-relative">
-          <input type="password" name="password" id="admin_password" class="form-control-glass pe-5" placeholder="••••••••" required>
-          <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePassword('admin_password', this)" style="cursor: pointer; z-index: 10;"></i>
+          <input type="password" name="password" id="admin_password" class="form-control-glass pe-5"
+            placeholder="••••••••" required>
+          <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+            onclick="togglePassword('admin_password', this)" style="cursor: pointer; z-index: 10;"></i>
         </div>
       </div>
-      <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2">
-        <i class="bi bi-shield-check"></i> Access Admin Panel
+      <button type="submit" class="btn-primary-glass btn-hover-icon btn-hover-icon-top w-100 justify-content-center mt-2">
+        <span class="btn-text-main"><i class="bi bi-shield-check"></i> Access Admin Panel</span>
+        <i class="bi bi-lock-fill btn-icon-hidden"></i>
       </button>
     </form>
 

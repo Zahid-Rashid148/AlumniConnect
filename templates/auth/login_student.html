@@ -15,17 +15,22 @@
       {% csrf_token %}
       <div class="form-group-glass">
         <label class="form-label-glass">Username</label>
-        <input type="text" name="username" class="form-control-glass" placeholder="your_username" autocomplete="username" required>
+        <input type="text" name="username" class="form-control-glass" placeholder="your_username"
+          autocomplete="username" required>
       </div>
       <div class="form-group-glass">
         <label class="form-label-glass">Password</label>
         <div class="position-relative">
-          <input type="password" name="password" id="student_password" class="form-control-glass pe-5" placeholder="••••••••" autocomplete="current-password" required>
-          <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePassword('student_password', this)" style="cursor: pointer; z-index: 10;"></i>
+          <input type="password" name="password" id="student_password" class="form-control-glass pe-5"
+            placeholder="••••••••" autocomplete="current-password" required>
+          <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+            onclick="togglePassword('student_password', this)" style="cursor: pointer; z-index: 10;"></i>
         </div>
       </div>
-      <button type="submit" class="btn-primary-glass w-100 justify-content-center mt-2">
-        <i class="bi bi-arrow-right-circle"></i> Sign In as Student
+      <button type="submit"
+        class="btn-primary-glass btn-hover-icon btn-hover-icon-right w-100 justify-content-center mt-2">
+        <span class="btn-text-main"><i class="bi bi-arrow-right-circle"></i> Sign In as Student</span>
+        <i class="bi bi-chevron-right btn-icon-hidden"></i>
       </button>
     </form>
 
@@ -41,4 +46,15 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function showGoogleLoading(btn) {
+    const text = btn.querySelector('.google-btn-text');
+    text.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Connecting to Google...';
+    btn.style.pointerEvents = 'none';
+    btn.style.opacity = '0.8';
+  }
+</script>
 {% endblock %}

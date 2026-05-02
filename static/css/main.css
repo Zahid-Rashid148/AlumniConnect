@@ -72,6 +72,26 @@ body {
   height: 100%;
   object-fit: cover;
   filter: brightness(0.6) contrast(1.1);
+  transition: background 0.5s ease, filter 0.5s ease;
+}
+
+#fire-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.6;
+  filter: blur(1px);
+  z-index: 1;
+}
+
+[data-theme="light"] #fire-canvas {
+  mix-blend-mode: color-dodge;
+  opacity: 0.15;
+  filter: brightness(0.5);
 }
 
 .cinematic-bg::after {
@@ -148,14 +168,41 @@ img {
 #page-loader {
   position: fixed;
   inset: 0;
-  background: var(--bg-deep);
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  gap: 24px;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  transition: opacity 0.8s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.8s;
+  /* Premium Slate-to-Noir Gradient Placeholder */
+  background: radial-gradient(circle at center, #1a1f2e 0%, #05070a 100%);
+}
+
+#page-loader::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/static/images/campus_bg_new.jpg') no-repeat center center;
+  background-size: cover;
+  opacity: 0;
+  /* The background image loads silently in the background */
+  animation: fade-in-bg 2s ease forwards;
+  z-index: -2;
+}
+
+#page-loader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(25px) saturate(1.8);
+  -webkit-backdrop-filter: blur(25px) saturate(1.8);
+  z-index: -1;
+}
+
+@keyframes fade-in-bg {
+  to {
+    opacity: 1;
+  }
 }
 
 #page-loader.hidden {
@@ -163,39 +210,92 @@ img {
   visibility: hidden;
 }
 
-.loader-logo {
-  font-family: 'Instrument Serif', serif;
-  font-size: 2rem;
-  color: var(--accent);
-  letter-spacing: 0.1em;
+.logo-fill-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  position: relative;
+  /* Hard-fixed width to prevent any movement when text or font loads */
+  width: 600px;
+  height: 150px;
+  animation: fade-only 0.6s ease-out forwards;
 }
 
-.loader-bar {
-  width: 200px;
-  height: 2px;
-  background: var(--border);
-  border-radius: 1px;
+.logo-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  /* Prevents logo from resizing */
+  width: 110px;
+  height: 110px;
+  border-radius: 30px;
   overflow: hidden;
 }
 
-.loader-bar::after {
-  content: '';
+.loader-logo-img {
+  width: 110px;
+  height: 110px;
   display: block;
-  height: 100%;
-  width: 40%;
-  background: var(--accent);
-  animation: loader-sweep 1.2s ease-in-out infinite;
 }
 
-@keyframes loader-sweep {
+.base-img {
+  opacity: 0.3;
+  filter: grayscale(1) brightness(0.7);
+  mix-blend-mode: overlay;
+}
+
+.fill-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  clip-path: inset(100% 0 0 0);
+  /* Snappier 2.5s fill */
+  animation: logo-fill-rising 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+}
+
+.fill-img {
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+}
+
+.loader-brand-text {
+  font-family: 'Instrument Serif', serif;
+  font-size: 3rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+  opacity: 0;
+  /* Reserve space even when invisible to prevent shifts */
+  width: 300px;
+  text-align: left;
+  animation: fade-only 0.6s ease-out forwards 0.4s;
+  mix-blend-mode: plus-lighter;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes logo-fill-rising {
   0% {
-    transform: translateX(-100%);
+    clip-path: inset(100% 0 0 0);
   }
 
   100% {
-    transform: translateX(350%);
+    clip-path: inset(0% 0 0 0);
   }
 }
+
+@keyframes fade-only {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Removed old motion-based keyframes for stability */
 
 /* ═══════════════════════════════════════════════════════════
    NAVBAR
@@ -605,8 +705,8 @@ img {
 
 /* Fix browser autofill changing background to white/blue */
 .form-control-glass:-webkit-autofill,
-.form-control-glass:-webkit-autofill:hover, 
-.form-control-glass:-webkit-autofill:focus, 
+.form-control-glass:-webkit-autofill:hover,
+.form-control-glass:-webkit-autofill:focus,
 .form-control-glass:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
   -webkit-text-fill-color: #fff !important;
@@ -1541,4 +1641,4 @@ select.form-control-glass option {
      
 }
 
-       
+               
