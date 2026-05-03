@@ -3,142 +3,160 @@
 
 {% block content %}
 <div class="dashboard-wrap">
-  <div class="container" style="max-width:800px">
-
-    <!-- Profile Card -->
-    <div class="glass-card mb-4 animate-rise" style="padding:0; position:relative;">
-      <!-- Cover -->
-      <div class="profile-cover"></div>
+  <div class="container">
+    <div class="row g-4">
       
-      <div class="profile-avatar-large">
-        {% if profile_user.avatar %}
-        <img src="{{ profile_user.avatar.url }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
-        {% else %}
-        {{ profile_user.display_name|first|upper }}
-        {% endif %}
-      </div>
-
-      <!-- Info -->
-      <div style="padding:3.5rem 2rem 2rem">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-          <div>
-            <h1 style="font-family:'Instrument Serif',serif;font-size:1.8rem;margin-bottom:.25rem">{{ profile_user.display_name }}</h1>
-            <div style="font-size:.85rem;color:var(--text-muted)">@{{ profile_user.username }}</div>
-
-            {% if profile_user.role == 'alumni' and alumni_profile %}
-            <div style="font-size:1rem;color:var(--accent);font-weight:600;margin-top:.5rem">
-              {{ alumni_profile.role }} at {{ alumni_profile.company }}
-            </div>
-            <div style="font-size:.85rem;color:var(--text-muted)">
-              {{ alumni_profile.experience_years }} years exp · Class of {{ alumni_profile.graduation_year }} · {{ alumni_profile.branch }}
-            </div>
-            {% elif profile_user.role == 'student' and student_profile %}
-            <div style="font-size:.9rem;color:var(--text-muted);margin-top:.5rem">
-              {{ student_profile.branch }} · Year {{ student_profile.year }}
-              {% if student_profile.roll_number %}· {{ student_profile.roll_number }}{% endif %}
-            </div>
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Profile Header Card -->
+        <div class="glass-card mb-4 animate-rise" style="padding:0; position:relative; overflow:visible;">
+          <!-- Cover -->
+          <div class="profile-cover" style="height:180px; background: linear-gradient(135deg, #0f172a 0%, #000 100%); position:relative; border-radius: var(--radius-lg) var(--radius-lg) 0 0; border-bottom:1px solid var(--glass-border); overflow:hidden;">
+            <div style="position:absolute; inset:0; opacity:0.15; background: url('/static/images/campus_bg.png') center; background-size:cover;"></div>
+          </div>
+          
+          <!-- Avatar (Absolute Positioned) -->
+          <div class="profile-avatar-large" style="width:150px; height:150px; border-radius:50%; border:6px solid var(--bg-card); background: var(--accent); display:flex; align-items:center; justify-content:center; font-size:4rem; font-weight:800; color:#000; overflow:hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); position:absolute; left:2rem; top:105px; z-index:100;">
+            {% if profile_user.avatar %}
+              <img src="{{ profile_user.avatar.url }}" alt="" style="width:100%; height:100%; object-fit:cover;">
+            {% else %}
+              {{ profile_user.display_name|first|upper }}
             {% endif %}
           </div>
 
-          <!-- Actions -->
-          <div class="d-flex gap-2 flex-wrap">
-            {% if request.user == profile_user %}
-              <a href="{% url 'edit_profile' %}" class="btn-ghost-glass">
-                <i class="bi bi-pencil"></i> Edit Profile
-              </a>
-            {% elif request.user.role == 'student' and profile_user.role == 'alumni' %}
-              <a href="{% url 'send_mentorship_request' profile_user.id %}" class="btn-primary-glass">
-                <i class="bi bi-send"></i> Request Mentorship
-              </a>
-            {% endif %}
-            {% if profile_user.linkedin %}
-            <a href="{{ profile_user.linkedin }}" target="_blank" class="btn-ghost-glass">
-              <i class="bi bi-linkedin"></i> LinkedIn
+          <!-- Profile Info Area -->
+          <div style="padding: 1.5rem 2rem 2.5rem; position:relative; margin-top:0;">
+            <!-- Top Row: Name and Action -->
+            <div class="d-flex justify-content-between align-items-start mb-4" style="padding-left: 170px; min-height: 80px;">
+              <div style="flex:1;">
+                <h1 style="font-family:'Instrument Serif',serif; font-size:2.8rem; margin:0; line-height:1; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">{{ profile_user.display_name }}</h1>
+                <div style="font-size:1.1rem; color:var(--text-muted); margin-top:8px; font-weight:500;">
+                  <span style="color:var(--accent); font-weight:700;">@{{ profile_user.username }}</span> · {{ profile_user.get_role_display }}
+                </div>
+              </div>
+              <div class="pt-2">
+                {% if request.user == profile_user %}
+                  <a href="{% url 'edit_profile' %}" class="btn-primary-glass px-4">
+                    <i class="bi bi-pencil-square"></i> Edit Profile
+                  </a>
+                {% elif request.user.role == 'student' and profile_user.role == 'alumni' %}
+                  <a href="{% url 'send_mentorship_request' profile_user.id %}" class="btn-primary-glass px-4">
+                    <i class="bi bi-send-fill"></i> Request Mentorship
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Detailed Info Grid -->
+            <div class="p-4 mt-5" style="background:rgba(255,255,255,0.03); border-radius:var(--radius-lg); border:1px solid var(--glass-border); box-shadow: inset 0 0 30px rgba(0,0,0,0.3);">
+              <div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; letter-spacing:0.12em; opacity:0.9;">Professional Summary</div>
+              <p style="font-size:1.05rem; line-height:1.8; margin:0; color: #fff; font-weight: 400;">{{ profile_user.bio|default:"No professional summary provided yet." }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience / Posts -->
+        {% if profile_user.role == 'alumni' and posts %}
+        <div class="glass-card-flat p-4 animate-rise-2">
+          <h3 style="font-family:'Instrument Serif',serif; font-size:1.4rem; margin-bottom:1.5rem">Contributions & Opportunities</h3>
+          {% for post in posts %}
+          <div class="post-card mb-3 p-3" style="background:rgba(255,255,255,0.03); border-radius:var(--radius-md); border:1px solid var(--glass-border);">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge-glass badge-{{ post.post_type }}">{{ post.get_post_type_display }}</span>
+              <span style="font-size:0.75rem; color:var(--text-dim)">{{ post.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div style="font-weight:600; font-size:1.1rem; margin-bottom:0.5rem;">{{ post.title }}</div>
+            <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem; line-height:1.6;">{{ post.content|truncatechars:200 }}</p>
+            {% if post.link %}
+            <a href="{{ post.link }}" target="_blank" class="btn-ghost-glass btn-sm">
+              View Details <i class="bi bi-arrow-up-right ms-1"></i>
             </a>
             {% endif %}
           </div>
-        </div>
-
-        <!-- Bio -->
-        {% if profile_user.bio %}
-        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--glass-border)">
-          <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">About</div>
-          <p style="font-size:.9rem;color:var(--text-primary);line-height:1.7">{{ profile_user.bio }}</p>
-        </div>
-        {% endif %}
-
-        <!-- Skills -->
-        {% if profile_user.role == 'alumni' and alumni_profile and alumni_profile.skills %}
-        <div style="margin-top:1.25rem">
-          <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">Skills</div>
-          {% for skill in alumni_profile.skills_list %}
-            <span class="skill-tag">{{ skill }}</span>
           {% endfor %}
         </div>
-        {% elif profile_user.role == 'student' and student_profile and student_profile.skills %}
-        <div style="margin-top:1.25rem">
-          <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem">Skills</div>
-          {% for skill in student_profile.skills_list %}
-            <span class="skill-tag">{{ skill }}</span>
-          {% endfor %}
+        {% elif profile_user.role == 'alumni' %}
+        <div class="glass-card-flat p-5 text-center animate-rise-2 opacity-50">
+          <i class="bi bi-clipboard-x" style="font-size:3rem;"></i>
+          <p class="mt-2">No contributions posted yet.</p>
         </div>
         {% endif %}
+      </div>
 
-        <!-- Alumni Extra Details -->
-        {% if profile_user.role == 'alumni' and alumni_profile %}
-        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:1.5rem">
-          {% if alumni_profile.domain %}
-          <div>
-            <div style="font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Domain</div>
-            <div style="font-size:.875rem;color:var(--text-primary);margin-top:.2rem">{{ alumni_profile.domain }}</div>
-          </div>
-          {% endif %}
-          <div>
-            <div style="font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Mentoring</div>
-            <div style="font-size:.875rem;margin-top:.2rem">
-              {% if alumni_profile.is_open_to_mentor %}
-                <span style="color:var(--success)">✓ Open to Mentor</span>
-              {% else %}
-                <span style="color:var(--text-dim)">Not currently mentoring</span>
-              {% endif %}
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Credentials Card -->
+        <div class="glass-card-flat p-4 mb-4 animate-rise-2">
+          <h5 style="font-size:0.85rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1.5rem; color: var(--accent);">Credentials</h5>
+          
+          {% if profile_user.role == 'alumni' and alumni_profile %}
+            <div class="mb-3">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;">Current Role</div>
+              <div style="font-weight:600; color:#fff;">{{ alumni_profile.role }}</div>
+              <div style="font-size:0.875rem; color:var(--text-muted);">{{ alumni_profile.company }}</div>
             </div>
+            <div class="mb-3">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;">Expertise</div>
+              <div style="font-weight:600; color:#fff;">{{ alumni_profile.domain }}</div>
+            </div>
+            <div class="mb-3">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;">Graduation</div>
+              <div style="font-weight:600; color:#fff;">Class of {{ alumni_profile.graduation_year }}</div>
+              <div style="font-size:0.875rem; color:var(--text-muted);">{{ alumni_profile.branch }}</div>
+            </div>
+          {% elif profile_user.role == 'student' and student_profile %}
+            <div class="mb-3">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;">Academic Status</div>
+              <div style="font-weight:600; color:#fff;">Year {{ student_profile.year }}</div>
+              <div style="font-size:0.875rem; color:var(--text-muted);">{{ student_profile.branch }}</div>
+            </div>
+            {% if student_profile.roll_number %}
+            <div class="mb-3">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;">Roll Number</div>
+              <div style="font-weight:600; color:#fff;">{{ student_profile.roll_number }}</div>
+            </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-3 opacity-50">
+               <div style="font-size:0.85rem;">Administrative Access</div>
+            </div>
+          {% endif %}
+
+          <hr style="border-color:var(--glass-border); margin:1.5rem 0; opacity:0.3;">
+          
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Social Presence</div>
+          <div class="d-flex gap-2">
+            {% if profile_user.linkedin %}
+            <a href="{{ profile_user.linkedin }}" target="_blank" class="btn-ghost-glass w-100 justify-content-center" style="font-size:0.85rem; padding: 0.6rem 1rem;">
+              <i class="bi bi-linkedin"></i> LinkedIn
+            </a>
+            {% else %}
+              <div class="text-muted small italic opacity-50">No verified links connected.</div>
+            {% endif %}
           </div>
-          <div>
-            <div style="font-size:.72rem;color:var(--text-muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Branch</div>
-            <div style="font-size:.875rem;color:var(--text-primary);margin-top:.2rem">{{ alumni_profile.branch }}</div>
+        </div>
+
+        <!-- Skills Card -->
+        <div class="glass-card-flat p-4 animate-rise-3">
+          <h5 style="font-size:0.85rem; font-weight:800; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1.5rem; color: var(--accent);">Skills & Tech Stack</h5>
+          <div class="d-flex flex-wrap gap-2">
+            {% if profile_user.role == 'alumni' and alumni_profile.skills %}
+              {% for skill in alumni_profile.skills_list %}
+                <span class="badge-glass px-3 py-2" style="font-size:0.75rem; background:rgba(255,255,255,0.05);">{{ skill }}</span>
+              {% endfor %}
+            {% elif profile_user.role == 'student' and student_profile.skills %}
+              {% for skill in student_profile.skills_list %}
+                <span class="badge-glass px-3 py-2" style="font-size:0.75rem; background:rgba(255,255,255,0.05);">{{ skill }}</span>
+              {% endfor %}
+            {% else %}
+              <div class="text-muted small italic opacity-50">Skill profile not yet completed.</div>
+            {% endif %}
           </div>
         </div>
-        {% endif %}
-
       </div>
-    </div>
 
-    <!-- Alumni Posts -->
-    {% if profile_user.role == 'alumni' and posts %}
-    <div class="glass-card-flat p-4 animate-rise-2">
-      <h3 style="font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:1rem">Posted Opportunities</h3>
-      {% for post in posts %}
-      <div class="post-card mb-3">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <span class="badge-glass badge-{{ post.post_type }}">{{ post.get_post_type_display }}</span>
-          <span style="font-size:.72rem;color:var(--text-dim)">{{ post.created_at|date:"M d, Y" }}</span>
-        </div>
-        <div class="post-title">{{ post.title }}</div>
-        <div class="post-meta">
-          {% if post.company %}{{ post.company }}{% endif %}
-          {% if post.location %}· {{ post.location }}{% endif %}
-        </div>
-        <p style="font-size:.85rem;color:var(--text-muted);margin-top:.5rem;line-height:1.6">{{ post.content|truncatechars:120 }}</p>
-        {% if post.link %}
-        <a href="{{ post.link }}" target="_blank" class="btn-ghost-glass mt-2" style="font-size:.8rem;padding:.4rem .9rem">
-          Apply <i class="bi bi-arrow-up-right"></i>
-        </a>
-        {% endif %}
-      </div>
-      {% endfor %}
     </div>
-    {% endif %}
-
   </div>
 </div>
 {% endblock %}
+

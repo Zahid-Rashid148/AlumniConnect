@@ -37,7 +37,8 @@
 
         <!-- Profile link -->
         <div style="padding:1rem">
-          <a href="javascript:void(0)" onclick="openProfileModal('{{ other_user.id }}')" class="btn-ghost-glass w-100 justify-content-center" style="font-size:.8rem">
+          <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#profileModal" 
+             onclick="openProfileModal('{{ other_user.id }}')" class="btn-ghost-glass w-100 justify-content-center" style="font-size:.8rem">
             <i class="bi bi-person"></i> View Profile
           </a>
           {% if other_user.linkedin %}
